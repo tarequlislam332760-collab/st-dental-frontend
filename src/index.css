@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Tailwind 4 এর নতুন নিয়ম */
+@import "tailwindcss";
+
+:root {
+  --font-sans: 'Poppins', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  
+}
