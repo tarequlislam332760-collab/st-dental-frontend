@@ -13,7 +13,7 @@ const Dashboard = ({ lang }) => {
   const fetchStats = async () => {
     try {
       setLoading(true);
-const res = await axios.get('https://st-dental-backend.vercel.app/api/dashboard');
+      const res = await axios.get('https://st-dental-backend.vercel.app/api/dashboard');
       setStatsData(res.data);
       setLoading(false);
     } catch (err) {
@@ -39,8 +39,8 @@ const res = await axios.get('https://st-dental-backend.vercel.app/api/dashboard'
 
   return (
     <div>
-      <h3 className="text-2xl font-black text-[#D4AF37] uppercase mb-8">{t.title}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <h3 className="text-xl md:text-2xl font-black text-[#D4AF37] uppercase mb-8 tracking-tighter italic">{t.title}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {stats.map((s, i) => (
           <div key={i} className="bg-[#111111] p-6 rounded-3xl border border-[#D4AF37]/10 relative overflow-hidden group hover:border-[#D4AF37]/30 transition-all duration-300">
             {loading ? (
@@ -53,7 +53,7 @@ const res = await axios.get('https://st-dental-backend.vercel.app/api/dashboard'
               <>
                 <s.icon className="text-[#D4AF37] mb-4 group-hover:scale-110 transition-transform" />
                 <p className="text-gray-500 text-xs uppercase font-bold mb-1">{s.label}</p>
-                <h4 className="text-4xl font-black text-white">
+                <h4 className="text-3xl md:text-4xl font-black text-white">
                   {s.value.toLocaleString()}
                 </h4>
               </>
