@@ -6,10 +6,10 @@ const ManageAppointments = ({ lang }) => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ডাটাবেস থেকে অ্যাপয়েন্টমেন্ট নিয়ে আসা
   const fetchAppointments = async () => {
     try {
-const res = await axios.get('https://st-dental-backend.vercel.app/api/appointments');
+      // লিঙ্ক আপডেট করা হয়েছে
+      const res = await axios.get('https://st-dental-backend.vercel.app/api/appointments');
       setAppointments(res.data);
       setLoading(false);
     } catch (err) {
@@ -22,12 +22,12 @@ const res = await axios.get('https://st-dental-backend.vercel.app/api/appointmen
     fetchAppointments();
   }, []);
 
-  // ডিলিট করার ফাংশন
   const handleDelete = async (id) => {
     if (window.confirm(lang === 'bn' ? "আপনি কি এটি ডিলিট করতে চান?" : "Are you sure?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/appointments/${id}`);
-        fetchAppointments(); // লিস্ট রিফ্রেশ করা
+        // ডিলিট লিঙ্ক আপডেট করা হয়েছে
+        await axios.delete(`https://st-dental-backend.vercel.app/api/appointments/${id}`);
+        fetchAppointments(); 
       } catch (err) {
         alert("Failed to delete");
       }
@@ -59,15 +59,8 @@ const res = await axios.get('https://st-dental-backend.vercel.app/api/appointmen
                 <td className="p-5 font-bold text-white">{appt.name}</td>
                 <td className="p-5 text-gray-400">{appt.service}</td>
                 <td className="p-5 flex justify-center gap-4">
-                  <button className="text-green-500 hover:scale-110 transition-transform">
-                    <CheckCircle size={20}/>
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(appt._id)}
-                    className="text-red-500 hover:scale-110 transition-transform"
-                  >
-                    <Trash2 size={20}/>
-                  </button>
+                  <button className="text-green-500 hover:scale-110 transition-transform"><CheckCircle size={20}/></button>
+                  <button onClick={() => handleDelete(appt._id)} className="text-red-500 hover:scale-110 transition-transform"><Trash2 size={20}/></button>
                 </td>
               </tr>
             ))}
