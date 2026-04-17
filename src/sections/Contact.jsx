@@ -26,8 +26,8 @@ const Contact = ({ lang }) => {
 
     try {
       // আপনার ব্যাকএন্ড এন্ডপয়েন্ট (index.js এ যা সেট করেছেন)
-      const res = await axios.post('http://localhost:5000/api/contact', formData);
-      
+
+      const res = await axios.post('https://st-dental-backend.vercel.app/api/contact', formData);
       if (res.data.success) {
         alert(lang === 'bn' ? "ধন্যবাদ! আপনার বার্তা সফলভাবে পাঠানো হয়েছে।" : "Thank you! Your message has been sent successfully.");
         // ফর্ম রিসেট করা

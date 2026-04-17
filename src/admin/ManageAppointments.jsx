@@ -9,7 +9,7 @@ const ManageAppointments = ({ lang }) => {
   // ডাটাবেস থেকে অ্যাপয়েন্টমেন্ট নিয়ে আসা
   const fetchAppointments = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/appointments');
+const res = await axios.get('https://st-dental-backend.vercel.app/api/appointments');
       setAppointments(res.data);
       setLoading(false);
     } catch (err) {

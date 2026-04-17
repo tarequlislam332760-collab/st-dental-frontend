@@ -41,7 +41,7 @@ const AdminPanel = ({ lang = 'bn' }) => {
   const handleDelete = async (id) => {
     if(window.confirm(lang === 'bn' ? "আপনি কি এটি ডিলিট করতে চান?" : "Are you sure you want to delete?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/appointments/${id}`);
+await axios.delete(`https://st-dental-backend.vercel.app/api/appointments/${id}`);
         fetchRecentData(); // লিস্ট রিফ্রেশ করা
       } catch (err) {
         alert("Delete failed!");

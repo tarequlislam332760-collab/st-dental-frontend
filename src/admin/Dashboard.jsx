@@ -13,7 +13,7 @@ const Dashboard = ({ lang }) => {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/dashboard');
+const res = await axios.get('https://st-dental-backend.vercel.app/api/dashboard');
       setStatsData(res.data);
       setLoading(false);
     } catch (err) {

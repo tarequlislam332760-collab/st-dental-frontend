@@ -54,8 +54,7 @@ const Testimonials = ({ lang = 'bn' }) => {
     const formData = { name, text: reviewText, rating };
 
     try {
-      const res = await axios.post('http://localhost:5000/api/reviews', formData);
-      
+const res = await axios.post('https://st-dental-backend.vercel.app/api/reviews', formData);      
       if (res.status === 201 || res.status === 200) {
         alert(lang === 'bn' ? "ধন্যবাদ! আপনার রিভিউটি জমা হয়েছে।" : "Thank you! Your review has been submitted.");
         setName("");

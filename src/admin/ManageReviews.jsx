@@ -28,7 +28,7 @@ const ManageReviews = ({ lang = 'bn' }) => {
     const confirmMsg = lang === 'bn' ? "আপনি কি এই রিভিউটি ডিলিট করতে চান?" : "Delete this review?";
     if (window.confirm(confirmMsg)) {
       try {
-        await axios.delete(`http://localhost:5000/api/reviews/${id}`);
+await axios.delete(`https://st-dental-backend.vercel.app/api/reviews/${id}`);
         fetchReviews(); // লিস্ট রিফ্রেশ করা
       } catch (err) {
         alert("Failed to delete review");
