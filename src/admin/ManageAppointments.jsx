@@ -38,16 +38,16 @@ const ManageAppointments = ({ lang }) => {
   }[lang];
 
   return (
-    <div>
-      <h3 className="text-xl md:text-2xl font-black text-[#D4AF37] uppercase mb-8 tracking-tighter italic">{t.title}</h3>
-      <div className="bg-[#111111] rounded-3xl overflow-hidden border border-[#D4AF37]/10">
+    <div className="w-full overflow-hidden">
+      <h3 className="text-xl md:text-2xl font-black text-[#D4AF37] uppercase mb-6 md:mb-8 tracking-tighter italic">{t.title}</h3>
+      <div className="bg-[#111111] rounded-[24px] md:rounded-3xl overflow-hidden border border-[#D4AF37]/10">
         <div className="overflow-x-auto">
-          <table className="w-full text-left min-w-[500px]">
-            <thead className="bg-[#D4AF37]/10 text-[#D4AF37] text-xs uppercase tracking-widest">
+          <table className="w-full text-left min-w-[450px]">
+            <thead className="bg-[#D4AF37]/10 text-[#D4AF37] text-[10px] md:text-xs uppercase tracking-widest">
               <tr>
-                <th className="p-5">{t.h1}</th>
-                <th className="p-5">{t.h2}</th>
-                <th className="p-5 text-center">{t.h3}</th>
+                <th className="p-4 md:p-5">{t.h1}</th>
+                <th className="p-4 md:p-5">{t.h2}</th>
+                <th className="p-4 md:p-5 text-center">{t.h3}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -55,12 +55,12 @@ const ManageAppointments = ({ lang }) => {
                 <tr><td colSpan="3" className="p-10 text-center text-gray-500">No appointments found.</td></tr>
               ) : appointments.map((appt) => (
                 <tr key={appt._id} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="p-5 font-bold text-white">{appt.name}</td>
-                  <td className="p-5 text-gray-400">{appt.service}</td>
-                  <td className="p-5">
-                    <div className="flex justify-center gap-4">
-                      <button className="text-green-500 hover:scale-110 transition-transform"><CheckCircle size={20}/></button>
-                      <button onClick={() => handleDelete(appt._id)} className="text-red-500 hover:scale-110 transition-transform"><Trash2 size={20}/></button>
+                  <td className="p-4 md:p-5 font-bold text-white text-sm md:text-base">{appt.name}</td>
+                  <td className="p-4 md:p-5 text-gray-400 text-sm md:text-base">{appt.service}</td>
+                  <td className="p-4 md:p-5">
+                    <div className="flex justify-center gap-3 md:gap-4">
+                      <button className="text-green-500 hover:scale-110 transition-transform"><CheckCircle size={18}/></button>
+                      <button onClick={() => handleDelete(appt._id)} className="text-red-500 hover:scale-110 transition-transform"><Trash2 size={18}/></button>
                     </div>
                   </td>
                 </tr>

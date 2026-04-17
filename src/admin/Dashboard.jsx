@@ -38,11 +38,11 @@ const Dashboard = ({ lang }) => {
   ];
 
   return (
-    <div>
-      <h3 className="text-xl md:text-2xl font-black text-[#D4AF37] uppercase mb-8 tracking-tighter italic">{t.title}</h3>
+    <div className="w-full">
+      <h3 className="text-xl md:text-2xl font-black text-[#D4AF37] uppercase mb-6 md:mb-8 tracking-tighter italic">{t.title}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {stats.map((s, i) => (
-          <div key={i} className="bg-[#111111] p-6 rounded-3xl border border-[#D4AF37]/10 relative overflow-hidden group hover:border-[#D4AF37]/30 transition-all duration-300">
+          <div key={i} className="bg-[#111111] p-5 md:p-6 rounded-[24px] md:rounded-3xl border border-[#D4AF37]/10 relative overflow-hidden group hover:border-[#D4AF37]/30 transition-all duration-300">
             {loading ? (
               <div className="animate-pulse">
                 <div className="h-6 w-6 bg-gray-800 rounded mb-4"></div>
@@ -51,9 +51,9 @@ const Dashboard = ({ lang }) => {
               </div>
             ) : (
               <>
-                <s.icon className="text-[#D4AF37] mb-4 group-hover:scale-110 transition-transform" />
-                <p className="text-gray-500 text-xs uppercase font-bold mb-1">{s.label}</p>
-                <h4 className="text-3xl md:text-4xl font-black text-white">
+                <s.icon className="text-[#D4AF37] mb-3 md:mb-4 group-hover:scale-110 transition-transform" size={20} />
+                <p className="text-gray-500 text-[10px] md:text-xs uppercase font-bold mb-1">{s.label}</p>
+                <h4 className="text-2xl md:text-4xl font-black text-white">
                   {s.value.toLocaleString()}
                 </h4>
               </>

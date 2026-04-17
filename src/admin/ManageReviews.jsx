@@ -40,8 +40,8 @@ const ManageReviews = ({ lang = 'bn' }) => {
   }[lang];
 
   return (
-    <div className="w-full">
-      {/* শিরোনাম - মোবাইলে টেক্সট সাইজ ছোট করা হয়েছে */}
+    <div className="w-full overflow-hidden">
+      {/* শিরোনাম - মোবাইলে টেক্সট সাইজ এবং মার্জিন রেসপনসিভ করা হয়েছে */}
       <h3 className="text-xl md:text-2xl font-black text-[#D4AF37] uppercase mb-6 md:mb-8 tracking-tighter italic">
         {t.title}
       </h3>
@@ -51,8 +51,8 @@ const ManageReviews = ({ lang = 'bn' }) => {
           <p className="text-gray-500 italic animate-pulse">Loading reviews...</p>
         </div>
       ) : (
-        /* গ্রিড: মোবাইলে ১টি, ট্যাবলেটে ২টি, এবং বড় স্ক্রিনে ৩টি কলাম (ইচ্ছানুসারে) */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6">
+        /* গ্রিড: মোবাইলে ১টি (grid-cols-1) এবং ট্যাবলেটে ২টি (sm:grid-cols-2) কলাম */
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
           {reviews.length === 0 ? (
             <p className="text-gray-500 col-span-full text-center py-10 border border-dashed border-white/10 rounded-3xl">
               {t.noData}
@@ -64,7 +64,7 @@ const ManageReviews = ({ lang = 'bn' }) => {
                 className="bg-[#111111] p-5 md:p-6 rounded-[24px] md:rounded-3xl border border-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
-                  {/* স্টার রেটিং */}
+                  {/* স্টার রেটিং - আইকন সাইজ ঠিক রাখা হয়েছে */}
                   <div className="flex text-[#D4AF37] mb-3 md:mb-4">
                     {[...Array(5)].map((_, i) => (
                       <Star 
@@ -76,24 +76,24 @@ const ManageReviews = ({ lang = 'bn' }) => {
                     ))}
                   </div>
 
-                  {/* রিভিউ টেক্সট - মোবাইলে ফন্ট সাইজ সামঞ্জস্যপূর্ণ করা হয়েছে */}
-                  <p className="text-gray-300 italic mb-6 leading-relaxed text-sm md:text-base">
+                  {/* রিভিউ টেক্সট - টেক্সট ব্রেকিং এবং সাইজ ফিক্স করা হয়েছে */}
+                  <p className="text-gray-300 italic mb-6 leading-relaxed text-sm md:text-base break-words">
                     "{rev.text || rev.comment || rev.message}"
                   </p>
                 </div>
 
                 {/* নিচের অংশ: নাম এবং ডিলিট বাটন */}
-                <div className="flex justify-between items-center border-t border-white/5 pt-4 mt-auto">
-                  <span className="font-bold text-[12px] md:text-sm text-white uppercase tracking-wider truncate mr-2">
+                <div className="flex justify-between items-center border-t border-white/5 pt-4 mt-auto gap-2">
+                  <span className="font-bold text-[11px] md:text-sm text-white uppercase tracking-wider truncate">
                     -- {rev.name}
                   </span>
                   
                   <button 
                     onClick={() => handleDelete(rev._id)} 
-                    className="text-red-500 flex items-center gap-1.5 text-[10px] md:text-xs uppercase font-black hover:bg-red-500/10 px-3 py-2 rounded-xl transition-all border border-red-500/10"
+                    className="text-red-500 flex items-center gap-1.5 text-[10px] md:text-xs uppercase font-black hover:bg-red-500/10 px-3 py-2 rounded-xl transition-all border border-red-500/10 shrink-0"
                   >
                     <Trash2 size={14}/> 
-                    <span className="hidden xs:inline">{t.delete}</span>
+                    <span className="inline">{t.delete}</span>
                   </button>
                 </div>
               </div>

@@ -12,7 +12,7 @@ const AdminPanel = ({ lang = 'bn' }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [recentAppointments, setRecentAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // মোবাইল মেনুর জন্য
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const fetchRecentData = async () => {
     try {
@@ -64,7 +64,6 @@ const AdminPanel = ({ lang = 'bn' }) => {
   return (
     <div className="flex min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-[#D4AF37] selection:text-black relative">
       
-      {/* মোবাইল মেনু বাটন */}
       <div className="md:hidden fixed top-4 right-4 z-[60]">
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -74,7 +73,6 @@ const AdminPanel = ({ lang = 'bn' }) => {
         </button>
       </div>
 
-      {/* সাইডবার - মোবাইলের জন্য রেসপনসিভ লজিক */}
       <aside className={`w-64 bg-[#111111] border-r border-[#D4AF37]/20 p-6 flex flex-col fixed h-full z-50 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="mb-10 px-2">
           <h1 className="text-2xl font-black tracking-tighter text-white uppercase italic">
@@ -105,7 +103,6 @@ const AdminPanel = ({ lang = 'bn' }) => {
         </button>
       </aside>
 
-      {/* মোবাইল ওভারলে */}
       {isSidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/60 z-40 md:hidden"
@@ -113,7 +110,7 @@ const AdminPanel = ({ lang = 'bn' }) => {
         ></div>
       )}
 
-      <main className="flex-1 md:ml-64 p-4 md:p-8 lg:p-12">
+      <main className="flex-1 md:ml-64 p-4 md:p-8 lg:p-12 w-full overflow-hidden">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
@@ -146,14 +143,15 @@ const AdminPanel = ({ lang = 'bn' }) => {
                 {t.viewAll}
               </button>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left min-w-[600px]">
+            {/* মোবাইল রেসপনসিভ টেবিল কন্টেইনার */}
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left min-w-[500px]">
                 <thead className="bg-[#1a1a1a] text-gray-400 text-xs uppercase tracking-[2px] font-bold">
                   <tr>
-                    <th className="p-6">{t.table.name}</th>
-                    <th className="p-6">{t.table.service}</th>
-                    <th className="p-6">{t.table.status}</th>
-                    <th className="p-6 text-center">{t.table.action}</th>
+                    <th className="p-4 md:p-6">{t.table.name}</th>
+                    <th className="p-4 md:p-6">{t.table.service}</th>
+                    <th className="p-4 md:p-6">{t.table.status}</th>
+                    <th className="p-4 md:p-6 text-center">{t.table.action}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -161,17 +159,18 @@ const AdminPanel = ({ lang = 'bn' }) => {
                     <tr><td colSpan="4" className="p-10 text-center text-gray-500">Loading appointments...</td></tr>
                   ) : recentAppointments.map((appt) => (
                     <tr key={appt._id} className="hover:bg-white/[0.02] transition-colors group">
-                      <td className="p-6 font-bold text-gray-200">{appt.name}</td>
-                      <td className="p-6 text-gray-400">{appt.service}</td>
-                      <td className="p-6">
-                        <span className="bg-yellow-500/10 text-yellow-500 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                      <td className="p-4 md:p-6 font-bold text-gray-200 text-sm md:text-base">{appt.name}</td>
+                      <td className="p-4 md:p-6 text-gray-400 text-sm md:text-base">{appt.service}</td>
+                      <td className="p-4 md:p-6">
+                        <span className="bg-yellow-500/10 text-yellow-500 px-3 md:px-4 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider">
                           {appt.status || 'Pending'}
                         </span>
                       </td>
-                      <td className="p-6">
-                        <div className="flex justify-center gap-3">
-                          <button className="w-10 h-10 flex items-center justify-center bg-green-500/10 text-green-500 rounded-xl hover:bg-green-500 hover:text-white transition-all"><CheckCircle size={18} /></button>
-                          <button onClick={() => handleDelete(appt._id)} className="w-10 h-10 flex items-center justify-center bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18} /></button>
+                      <td className="p-4 md:p-6">
+                        <div className="flex justify-center gap-2 md:gap-3">
+                          <button className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-green-500/10 text-green-500 rounded-lg md:rounded-xl hover:bg-green-500 hover:text-white transition-all"><CheckCircle size={16} /></button>
+                          {/* ডিলিট ফাংশন এখানে যুক্ত করা হয়েছে */}
+                          <button onClick={() => handleDelete(appt._id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-red-500/10 text-red-500 rounded-lg md:rounded-xl hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16} /></button>
                         </div>
                       </td>
                     </tr>
