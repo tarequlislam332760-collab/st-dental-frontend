@@ -1,15 +1,17 @@
 import React from 'react';
 import SafeIcon from './SafeIcon';
-import { QRCodeSVG } from 'qrcode.react'; // QR কোড লাইব্রেরি
+import { QRCodeSVG } from 'qrcode.react';
 
 const Footer = () => {
-  const websiteUrl = "https://st-dental-care.vercel.app"; // আপনার লাইভ সাইট ইউআরএল
+  // এখানে আপনার সঠিক Vercel লিঙ্কটি ব্যবহার করুন
+  // নিশ্চিত করুন যে ব্রাউজারে এই লিঙ্কটি ওপেন করলে আপনার ওয়েবসাইট দেখা যায়
+  const websiteUrl = "https://st-dental-backend.vercel.app"; 
 
   return (
     <footer className="bg-[#0a0a0a] py-20 px-6 border-t border-[#D4AF37]/10">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
         
-        {/* লোগো এবং কপিরাইট সেকশন */}
+        {/* লোগো এবং কপিরাইট */}
         <div className="flex flex-col items-center md:items-start">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-[#D4AF37] rounded-xl flex items-center justify-center text-[14px] text-black font-black shadow-[0_0_20px_rgba(212,175,55,0.2)]">
@@ -24,7 +26,7 @@ const Footer = () => {
           </p>
         </div>
 
-        {/* ডাইনামিক QR কোড সেকশন */}
+        {/* ডাইনামিক QR কোড - প্রিমিয়াম স্টাইল */}
         <div className="flex flex-col items-center gap-3 group">
           <div className="p-3 bg-white rounded-2xl shadow-[0_0_30px_rgba(212,175,55,0.1)] group-hover:shadow-[0_0_40px_rgba(212,175,55,0.2)] transition-all duration-500">
             <QRCodeSVG 
@@ -32,7 +34,7 @@ const Footer = () => {
               size={100} 
               bgColor={"#ffffff"} 
               fgColor={"#000000"} 
-              level={"H"} // High error correction
+              level={"L"} // 'H' থেকে 'L' করা হয়েছে যাতে স্ক্যান দ্রুত হয়
               includeMargin={false}
             />
           </div>
@@ -56,7 +58,6 @@ const Footer = () => {
 
       </div>
 
-      {/* ডেকোরেটিভ লাইন */}
       <div className="max-w-7xl mx-auto mt-16 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent"></div>
     </footer>
   );
