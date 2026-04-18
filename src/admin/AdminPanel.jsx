@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, MessageSquare, LogOut, Edit, Trash2, CheckCircle, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, LogOut, Edit, Trash2, CheckCircle, Menu, X, Save } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
@@ -13,6 +13,10 @@ const AdminPanel = ({ lang = 'bn' }) => {
   const [recentAppointments, setRecentAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // এডিট করার জন্য নতুন স্টেট
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({ name: '', service: '' });
 
   const fetchRecentData = async () => {
     try {
@@ -35,6 +39,7 @@ const AdminPanel = ({ lang = 'bn' }) => {
     window.location.href = '/st-admin-secure/login';
   };
 
+  // ডিলিট ফাংশন
   const handleDelete = async (id) => {
     if(window.confirm(lang === 'bn' ? "আপনি কি এটি ডিলিট করতে চান?" : "Are you sure you want to delete?")) {
       try {
@@ -43,6 +48,23 @@ const AdminPanel = ({ lang = 'bn' }) => {
       } catch (err) {
         alert("Delete failed!");
       }
+    }
+  };
+
+  // এডিট মুড অন করা
+  const startEdit = (appt) => {
+    setEditingId(appt._id);
+    setEditForm({ name: appt.name, service: appt.service });
+  };
+
+  // আপডেট সেভ করা
+  const handleSave = async (id) => {
+    try {
+      await axios.put(`https://st-dental-backend.vercel.app/api/appointments/${id}`, editForm);
+      setEditingId(null);
+      fetchRecentData();
+    } catch (err) {
+      alert("Update failed!");
     }
   };
 
@@ -143,7 +165,7 @@ const AdminPanel = ({ lang = 'bn' }) => {
                 {t.viewAll}
               </button>
             </div>
-            {/* মোবাইল রেসপনসিভ টেবিল কন্টেইনার */}
+            
             <div className="overflow-x-auto w-full">
               <table className="w-full text-left min-w-[500px]">
                 <thead className="bg-[#1a1a1a] text-gray-400 text-xs uppercase tracking-[2px] font-bold">
@@ -159,8 +181,28 @@ const AdminPanel = ({ lang = 'bn' }) => {
                     <tr><td colSpan="4" className="p-10 text-center text-gray-500">Loading appointments...</td></tr>
                   ) : recentAppointments.map((appt) => (
                     <tr key={appt._id} className="hover:bg-white/[0.02] transition-colors group">
-                      <td className="p-4 md:p-6 font-bold text-gray-200 text-sm md:text-base">{appt.name}</td>
-                      <td className="p-4 md:p-6 text-gray-400 text-sm md:text-base">{appt.service}</td>
+                      <td className="p-4 md:p-6 text-sm md:text-base">
+                        {editingId === appt._id ? (
+                          <input 
+                            className="bg-black border border-[#D4AF37] p-1 rounded text-white"
+                            value={editForm.name}
+                            onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                          />
+                        ) : (
+                          <span className="font-bold text-gray-200">{appt.name}</span>
+                        )}
+                      </td>
+                      <td className="p-4 md:p-6 text-sm md:text-base">
+                        {editingId === appt._id ? (
+                          <input 
+                            className="bg-black border border-[#D4AF37] p-1 rounded text-white"
+                            value={editForm.service}
+                            onChange={(e) => setEditForm({...editForm, service: e.target.value})}
+                          />
+                        ) : (
+                          <span className="text-gray-400">{appt.service}</span>
+                        )}
+                      </td>
                       <td className="p-4 md:p-6">
                         <span className="bg-yellow-500/10 text-yellow-500 px-3 md:px-4 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider">
                           {appt.status || 'Pending'}
@@ -168,8 +210,12 @@ const AdminPanel = ({ lang = 'bn' }) => {
                       </td>
                       <td className="p-4 md:p-6">
                         <div className="flex justify-center gap-2 md:gap-3">
+                          {editingId === appt._id ? (
+                            <button onClick={() => handleSave(appt._id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-blue-500/10 text-blue-500 rounded-lg md:rounded-xl hover:bg-blue-500 hover:text-white transition-all"><Save size={16} /></button>
+                          ) : (
+                            <button onClick={() => startEdit(appt)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-yellow-500/10 text-yellow-500 rounded-lg md:rounded-xl hover:bg-yellow-500 hover:text-white transition-all"><Edit size={16} /></button>
+                          )}
                           <button className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-green-500/10 text-green-500 rounded-lg md:rounded-xl hover:bg-green-500 hover:text-white transition-all"><CheckCircle size={16} /></button>
-                          {/* ডিলিট ফাংশন এখানে যুক্ত করা হয়েছে */}
                           <button onClick={() => handleDelete(appt._id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-red-500/10 text-red-500 rounded-lg md:rounded-xl hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16} /></button>
                         </div>
                       </td>

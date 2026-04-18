@@ -36,19 +36,17 @@ const ManageAppointments = ({ lang }) => {
     }
   };
 
-  // এডিট মোড শুরু করা
   const startEdit = (appt) => {
     setEditingId(appt._id);
     setEditData({ name: appt.name, service: appt.service });
   };
 
-  // এডিট সেভ করা
   const handleSave = async (id) => {
     try {
       await axios.put(`https://st-dental-backend.vercel.app/api/appointments/${id}`, editData);
       setEditingId(null);
       fetchAppointments();
-      alert(lang === 'bn' ? "সফলভাবে আপডেট করা হয়েছে" : "Updated successfully");
+      alert(lang === 'bn' ? "সফলভাবে আপডেট করা হয়েছে" : "Updated successfully");
     } catch (err) {
       alert("Update failed");
     }

@@ -22,9 +22,7 @@ const Dashboard = ({ lang }) => {
     }
   };
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  useEffect(() => { fetchStats(); }, []);
 
   const t = {
     en: { title: "Overview", s1: "Total Appointments", s2: "New Reviews", s3: "Total Patients" },
@@ -53,9 +51,7 @@ const Dashboard = ({ lang }) => {
               <>
                 <s.icon className="text-[#D4AF37] mb-3 md:mb-4 group-hover:scale-110 transition-transform" size={20} />
                 <p className="text-gray-500 text-[10px] md:text-xs uppercase font-bold mb-1">{s.label}</p>
-                <h4 className="text-2xl md:text-4xl font-black text-white">
-                  {s.value.toLocaleString()}
-                </h4>
+                <h4 className="text-2xl md:text-4xl font-black text-white">{s.value.toLocaleString()}</h4>
               </>
             )}
           </div>
