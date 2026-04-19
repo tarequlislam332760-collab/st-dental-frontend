@@ -60,10 +60,8 @@ const languages = [
   { code: 'de', name: 'Deutsch' }, { code: 'zh', name: '中文' }, { code: 'ru', name: 'Русский' }, { code: 'tr', name: 'Türkçe' }
 ];
 
-// মেইন লেআউট কম্পোনেন্ট যেখানে সব লজিক থাকবে
 const AppContent = () => {
   const [lang, setLang] = useState('bn');
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileTreatmentOpen, setIsMobileTreatmentOpen] = useState(false); 
   const [scrolled, setScrolled] = useState(false);
@@ -71,7 +69,6 @@ const AppContent = () => {
   const [isLangOpen, setIsLangOpen] = useState(false);
 
   const location = useLocation();
-  // যদি ইউআরএল /st-admin-secure দিয়ে শুরু হয় তবে সেটিকে অ্যাডমিন মোড ধরবে
   const isAdminPath = location.pathname.startsWith('/st-admin-secure');
 
   useEffect(() => {
@@ -95,7 +92,6 @@ const AppContent = () => {
   return (
     <div className="min-h-screen bg-white font-sans text-[#1a1a1a] overflow-x-hidden">
       
-      {/* Header: অ্যাডমিন পাথে থাকলে এটি হাইড থাকবে */}
       {!isAdminPath && (
         <header className={`fixed top-0 w-full z-[100] transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md py-2' : 'bg-white py-4'}`}>
           <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between">
@@ -163,7 +159,6 @@ const AppContent = () => {
         </header>
       )}
 
-      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && !isAdminPath && (
           <>
@@ -193,33 +188,32 @@ const AppContent = () => {
           </>
         )}
       </AnimatePresence>
-<Routes>
-  <WhatsAppWidget />
-  {/* পাবলিক রাউটগুলো */}
-  <Route path="/" element={<Home lang={lang} />} /> 
-  <Route path="/services" element={<Services lang={lang} />} />
-  <Route path="/about" element={<About lang={lang} />} />
-  <Route path="/contact" element={<Contact lang={lang} />} />
-  <Route path="/dental-care" element={<DentalCare lang={lang} />} />
-  <Route path="/skin-care" element={<SkinCare lang={lang} />} />
-  <Route path="/appointment" element={<Appointment lang={lang} />} />
-  <Route path="/testimonials" element={<Testimonials lang={lang} />} />
-  
-  {/* অ্যাডমিন লগইন রাউট (এটি প্রটেক্টেড হবে না) */}
-  <Route path="/st-admin-secure/login" element={<Login />} />
 
-  {/* প্রটেক্টেড অ্যাডমিন রাউট (সঠিক নিয়ম) */}
-  <Route 
-    path="/st-admin-secure/*" 
-    element={
-      <ProtectedRoute>
-        <AdminPanel lang={lang} />
-      </ProtectedRoute>
-    }  
-  />
-</Routes>
+      {/* WhatsAppWidget Routes এর বাইরে থাকতে হবে */}
+      {!isAdminPath && <WhatsAppWidget lang={lang} />}
 
-      {/* Footer: অ্যাডমিন পাথে থাকলে এটি হাইড থাকবে */}
+      <Routes>
+        <Route path="/" element={<Home lang={lang} />} /> 
+        <Route path="/services" element={<Services lang={lang} />} />
+        <Route path="/about" element={<About lang={lang} />} />
+        <Route path="/contact" element={<Contact lang={lang} />} />
+        <Route path="/dental-care" element={<DentalCare lang={lang} />} />
+        <Route path="/skin-care" element={<SkinCare lang={lang} />} />
+        <Route path="/appointment" element={<Appointment lang={lang} />} />
+        <Route path="/testimonials" element={<Testimonials lang={lang} />} />
+        
+        <Route path="/st-admin-secure/login" element={<Login />} />
+
+        <Route 
+          path="/st-admin-secure/*" 
+          element={
+            <ProtectedRoute>
+              <AdminPanel lang={lang} />
+            </ProtectedRoute>
+          }   
+        />
+      </Routes>
+
       {!isAdminPath && (
         <footer className="bg-[#0f0f0f] text-white pt-20 pb-10 px-6 mt-20 border-t border-gray-800">
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
@@ -283,7 +277,6 @@ const AppContent = () => {
   );
 };
 
-// মেইন অ্যাপ ফাংশন
 function App() {
   return (
     <Router>
