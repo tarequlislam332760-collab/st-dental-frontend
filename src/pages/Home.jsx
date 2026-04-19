@@ -11,7 +11,7 @@ import Contact from '../sections/Contact';
 
 // নতুন ফিচারগুলোর ইম্পোর্ট (নিশ্চিত করুন এই ফাইলগুলো আপনার components ফোল্ডারে আছে)
 import TransformSlider from '../components/TransformSlider';
-import Appointment from '../components/Appointment';
+import Appointment from '../pages/Appointment';
 import WhatsAppWidget from '../components/WhatsAppWidget';
 
 const Home = ({ lang }) => {
