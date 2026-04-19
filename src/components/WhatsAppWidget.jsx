@@ -3,7 +3,7 @@ import React from 'react';
 const WhatsAppWidget = () => {
   return (
     <a 
-      href="https://wa.me/+8801XXXXXXXXX" // আপনার নাম্বার দিন
+      href="https://wa.me/+880 1711-023730" // আপনার নাম্বার দিন
       target="_blank"
       className="fixed bottom-8 right-8 z-[999] flex items-center gap-3 bg-[#25D366] p-2 pr-6 rounded-full shadow-[0_15px_40px_rgba(37,211,102,0.4)] hover:scale-105 transition-all group active:scale-95"
     >
