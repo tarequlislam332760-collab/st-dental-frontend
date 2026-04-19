@@ -5,13 +5,15 @@ const Appointment = ({ lang }) => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    service: 'Select Service'
+    department: 'Select Department',
+    date: '',
+    time: ''
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.service === 'Select Service') {
-      alert(lang === 'bn' ? 'দয়া করে একটি সেবা নির্বাচন করুন' : 'Please select a service');
+    if (formData.department === 'Select Department' || !formData.time) {
+      alert(lang === 'bn' ? 'দয়া করে বিভাগ এবং সময় নির্বাচন করুন' : 'Please select department and time slot');
       return;
     }
 
@@ -19,7 +21,7 @@ const Appointment = ({ lang }) => {
       const res = await axios.post('https://st-dental-backend.vercel.app/api/appointments', formData);      
       if (res.data.success) {
         alert(lang === 'bn' ? 'আপনার সিরিয়াল সফলভাবে নিশ্চিত করা হয়েছে!' : 'Appointment confirmed successfully!');
-        setFormData({ name: '', phone: '', service: 'Select Service' });
+        setFormData({ name: '', phone: '', department: 'Select Department', date: '', time: '' });
       }
     } catch (error) {
       console.error('Error:', error);
@@ -28,55 +30,111 @@ const Appointment = ({ lang }) => {
   };
 
   return (
-    // মোবাইলে প্যাডিং কমানো হয়েছে (pt-24 pb-10)
-    <section className="pt-24 md:pt-40 pb-10 md:pb-20 px-4 md:px-6 overflow-hidden">
-      {/* মোবাইলে rounded-[30px] এবং প্যাডিং p-6 করা হয়েছে */}
-      <div className="max-w-2xl mx-auto bg-[#111111] p-6 md:p-12 rounded-[30px] md:rounded-[50px] shadow-2xl border border-[#D4AF37]/20">
-        
-        {/* টেক্সট সাইজ মোবাইলে ছোট করা হয়েছে */}
-        <h2 className="text-2xl md:text-4xl font-black mb-6 md:mb-8 text-center text-white uppercase italic">
-          {lang === 'bn' ? (
-            <>অ্যাপয়েন্টমেন্ট <span className="text-[#D4AF37]">নিন</span></>
-          ) : (
-            <>Get <span className="text-[#D4AF37]">Appointment</span></>
-          )}
-        </h2>
+    <section className="relative pt-24 md:pt-40 pb-16 px-4 overflow-hidden bg-[#0a0a0a]">
+      {/* Background Decorative Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#D4AF37] opacity-[0.05] blur-[120px] pointer-events-none"></div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <input 
-            type="text" 
-            required
-            value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
-            placeholder={lang === 'bn' ? 'আপনার নাম' : 'Your Name'} 
-            className="w-full p-4 rounded-xl md:rounded-2xl bg-[#0a0a0a] text-white border border-white/10 shadow-sm focus:ring-2 ring-[#D4AF37] outline-none placeholder:text-gray-500 text-sm md:text-base" 
-          />
-          <input 
-            type="tel" 
-            required
-            value={formData.phone}
-            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-            placeholder={lang === 'bn' ? 'ফোন নম্বর' : 'Phone Number'} 
-            className="w-full p-4 rounded-xl md:rounded-2xl bg-[#0a0a0a] text-white border border-white/10 shadow-sm focus:ring-2 ring-[#D4AF37] outline-none placeholder:text-gray-500 text-sm md:text-base" 
-          />
+      <div className="max-w-4xl mx-auto relative z-10">
+        <div className="bg-[#111111] p-6 md:p-12 rounded-[35px] md:rounded-[60px] shadow-2xl border border-[#D4AF37]/10">
           
-          <select 
-            value={formData.service}
-            onChange={(e) => setFormData({...formData, service: e.target.value})}
-            className="w-full p-4 rounded-xl md:rounded-2xl bg-[#0a0a0a] text-white border border-white/10 shadow-sm md:col-span-2 outline-none focus:ring-2 ring-[#D4AF37] text-sm md:text-base"
-          >
-            <option value="Select Service" disabled>{lang === 'bn' ? 'সেবা নির্বাচন করুন' : 'Select Service'}</option>
-            <option value="Dental Care" className="bg-[#111111]">Dental Care</option>
-            <option value="Skin Care" className="bg-[#111111]">Skin Care</option>
-          </select>
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-5xl font-black text-white uppercase italic tracking-tighter">
+              {lang === 'bn' ? (
+                <>অ্যাপয়েন্টমেন্ট <span className="text-[#D4AF37]">নিন</span></>
+              ) : (
+                <>Premium <span className="text-[#D4AF37]">Booking</span></>
+              )}
+            </h2>
+            <p className="text-[10px] md:text-xs text-gray-500 uppercase tracking-[4px] mt-3">
+              {lang === 'bn' ? 'ডেন্টাল এবং ফেসিয়াল এসথেটিক্স' : 'Advanced Dental & Facial Aesthetics'}
+            </p>
+          </div>
 
-          <button 
-            type="submit"
-            className="w-full md:col-span-2 bg-[#D4AF37] text-black py-4 md:py-5 rounded-xl md:rounded-2xl font-black uppercase shadow-lg hover:bg-[#b8972f] transition-all transform active:scale-95 text-sm md:text-base mt-2"
-          >
-            {lang === 'bn' ? 'সিরিয়াল নিশ্চিত করুন' : 'Confirm Appointment'}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+            
+            {/* Name */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-[2px] text-[#D4AF37] font-bold ml-1">Full Name</label>
+              <input 
+                type="text" 
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                placeholder="John Doe" 
+                className="w-full p-4 md:p-5 rounded-2xl bg-black/50 text-white border border-white/5 focus:border-[#D4AF37] outline-none transition-all placeholder:text-gray-800" 
+              />
+            </div>
+
+            {/* Phone */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-[2px] text-[#D4AF37] font-bold ml-1">Phone Number</label>
+              <input 
+                type="tel" 
+                required
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                placeholder="+880 1XXX-XXXXXX" 
+                className="w-full p-4 md:p-5 rounded-2xl bg-black/50 text-white border border-white/5 focus:border-[#D4AF37] outline-none transition-all placeholder:text-gray-800" 
+              />
+            </div>
+
+            {/* Department Selection */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-[2px] text-[#D4AF37] font-bold ml-1">Select Department</label>
+              <select 
+                value={formData.department}
+                onChange={(e) => setFormData({...formData, department: e.target.value})}
+                className="w-full p-4 md:p-5 rounded-2xl bg-black/50 text-gray-400 border border-white/5 focus:border-[#D4AF37] outline-none transition-all appearance-none"
+              >
+                <option value="Select Department" disabled>{lang === 'bn' ? 'বিভাগ নির্বাচন করুন' : 'Select Department'}</option>
+                <option value="Dental Care">Dental Care (Teeth)</option>
+                <option value="Facial Aesthetic">Facial Aesthetic (Skin/Face)</option>
+                <option value="Maxillofacial Surgery">Maxillofacial Surgery</option>
+              </select>
+            </div>
+
+            {/* Date Selection */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-[2px] text-[#D4AF37] font-bold ml-1">Preferred Date</label>
+              <input 
+                type="date" 
+                required
+                value={formData.date}
+                onChange={(e) => setFormData({...formData, date: e.target.value})}
+                className="w-full p-4 md:p-5 rounded-2xl bg-black/50 text-gray-400 border border-white/5 focus:border-[#D4AF37] outline-none transition-all" 
+              />
+            </div>
+
+            {/* Time Slot (Full Width on Mobile) */}
+            <div className="md:col-span-2 flex flex-col gap-3">
+              <label className="text-[9px] uppercase tracking-[2px] text-[#D4AF37] font-bold ml-1 text-center md:text-left">Available Time Slots</label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {['10:00 AM', '12:00 PM', '04:30 PM', '07:30 PM'].map((slot) => (
+                  <button
+                    key={slot}
+                    type="button"
+                    onClick={() => setFormData({...formData, time: slot})}
+                    className={`py-3 px-2 rounded-xl text-[11px] font-bold uppercase transition-all border ${
+                      formData.time === slot 
+                      ? 'bg-[#D4AF37] text-black border-[#D4AF37]' 
+                      : 'bg-black/30 text-gray-500 border-white/5 hover:border-[#D4AF37]/50'
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button 
+              type="submit"
+              className="w-full md:col-span-2 bg-[#D4AF37] text-black py-5 rounded-[20px] font-black uppercase shadow-[0_10px_40px_rgba(212,175,55,0.2)] hover:bg-white hover:shadow-white/10 transition-all transform active:scale-95 mt-4 tracking-widest"
+            >
+              {lang === 'bn' ? 'সিরিয়াল নিশ্চিত করুন' : 'Confirm Appointment'}
+            </button>
+          </form>
+        </div>
       </div>
     </section>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, MessageSquare, LogOut, Edit, Trash2, CheckCircle, Menu, X, Save } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, LogOut, Edit, Trash2, CheckCircle, Menu, X, Save, Clock, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
@@ -14,15 +14,14 @@ const AdminPanel = ({ lang = 'bn' }) => {
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
-  // এডিট করার জন্য নতুন স্টেট
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ name: '', service: '' });
+  const [editForm, setEditForm] = useState({ name: '', service: '', timeSlot: '', appointmentDate: '' });
 
   const fetchRecentData = async () => {
     try {
       setLoading(true);
       const res = await axios.get('https://st-dental-backend.vercel.app/api/appointments');
-      setRecentAppointments(res.data.slice(0, 5)); 
+      setRecentAppointments(res.data.slice(0, 8)); // সাম্প্রতিক ৮টি অ্যাপয়েন্টমেন্ট
       setLoading(false);
     } catch (err) {
       console.error("Error fetching admin data:", err);
@@ -39,7 +38,6 @@ const AdminPanel = ({ lang = 'bn' }) => {
     window.location.href = '/st-admin-secure/login';
   };
 
-  // ডিলিট ফাংশন
   const handleDelete = async (id) => {
     if(window.confirm(lang === 'bn' ? "আপনি কি এটি ডিলিট করতে চান?" : "Are you sure you want to delete?")) {
       try {
@@ -51,13 +49,16 @@ const AdminPanel = ({ lang = 'bn' }) => {
     }
   };
 
-  // এডিট মুড অন করা
   const startEdit = (appt) => {
     setEditingId(appt._id);
-    setEditForm({ name: appt.name, service: appt.service });
+    setEditForm({ 
+      name: appt.name, 
+      service: appt.service, 
+      timeSlot: appt.timeSlot || '', 
+      appointmentDate: appt.appointmentDate || '' 
+    });
   };
 
-  // আপডেট সেভ করা
   const handleSave = async (id) => {
     try {
       await axios.put(`https://st-dental-backend.vercel.app/api/appointments/${id}`, editForm);
@@ -71,34 +72,33 @@ const AdminPanel = ({ lang = 'bn' }) => {
   const t = {
     en: {
       dash: "Dashboard", appt: "Appointments", rev: "Reviews", logout: "Logout",
-      welcome: "Welcome back,", subtitle: "Manage your clinic activities today.",
-      recent: "Recent Appointments", viewAll: "View All",
-      table: { name: "Patient Name", service: "Service", status: "Status", action: "Action" }
+      welcome: "Welcome back,", subtitle: "Manage your dental & facial clinic.",
+      recent: "Recent Schedule", viewAll: "View All",
+      table: { name: "Patient", info: "Service & Time", status: "Status", action: "Action" }
     },
     bn: {
       dash: "ড্যাশবোর্ড", appt: "অ্যাপয়েন্টমেন্ট", rev: "রিভিউ", logout: "লগআউট",
-      welcome: "স্বাগতম,", subtitle: "আপনার ক্লিনিকের কার্যক্রম আজই পরিচালনা করুন।",
-      recent: "সাম্প্রতিক অ্যাপয়েন্টমেন্ট", viewAll: "সব দেখুন",
-      table: { name: "রোগীর নাম", service: "সেবা", status: "অবস্থা", action: "অ্যাকশন" }
+      welcome: "স্বাগতম,", subtitle: "ডেন্টাল এবং ফেসিয়াল ক্লিনিক পরিচালনা করুন।",
+      recent: "সাম্প্রতিক শিডিউল", viewAll: "সব দেখুন",
+      table: { name: "রোগী", info: "সেবা ও সময়", status: "অবস্থা", action: "অ্যাকশন" }
     }
   }[lang];
 
   return (
-    <div className="flex min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-[#D4AF37] selection:text-black relative">
+    <div className="flex min-h-screen bg-[#050505] text-white font-sans selection:bg-[#D4AF37] selection:text-black relative">
       
+      {/* Mobile Toggle */}
       <div className="md:hidden fixed top-4 right-4 z-[60]">
-        <button 
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-3 bg-[#D4AF37] text-black rounded-xl shadow-lg"
-        >
+        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-3 bg-[#D4AF37] text-black rounded-xl shadow-lg">
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      <aside className={`w-64 bg-[#111111] border-r border-[#D4AF37]/20 p-6 flex flex-col fixed h-full z-50 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      {/* Sidebar */}
+      <aside className={`w-64 bg-[#0a0a0a] border-r border-[#D4AF37]/10 p-6 flex flex-col fixed h-full z-50 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="mb-10 px-2">
-          <h1 className="text-2xl font-black tracking-tighter text-white uppercase italic">
-            S T <span className="text-[#D4AF37]">ADMIN</span>
+          <h1 className="text-xl font-black tracking-tighter text-white uppercase italic">
+            ST <span className="text-[#D4AF37]">HOSPITAL</span>
           </h1>
         </div>
         <nav className="flex-1 space-y-2">
@@ -110,47 +110,41 @@ const AdminPanel = ({ lang = 'bn' }) => {
             <button 
               key={item.id}
               onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
-              className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 ${
+              className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
                 activeTab === item.id 
-                ? 'bg-[#D4AF37] text-black font-bold shadow-[0_10px_20px_rgba(212,175,55,0.2)]' 
-                : 'hover:bg-white/5 text-gray-400 hover:text-[#D4AF37]'
+                ? 'bg-[#D4AF37] text-black font-bold shadow-lg' 
+                : 'hover:bg-white/5 text-gray-500 hover:text-[#D4AF37]'
               }`}
             >
-              <item.icon size={20} /> {item.label}
+              <item.icon size={18} /> {item.label}
             </button>
           ))}
         </nav>
-        <button onClick={handleLogout} className="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-xl mt-auto transition-all duration-300 font-bold">
-          <LogOut size={20} /> {t.logout}
+        <button onClick={handleLogout} className="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-xl mt-auto font-bold transition-all">
+          <LogOut size={18} /> {t.logout}
         </button>
       </aside>
 
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/60 z-40 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
-      )}
-
-      <main className="flex-1 md:ml-64 p-4 md:p-8 lg:p-12 w-full overflow-hidden">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight">
+      {/* Main Content */}
+      <main className="flex-1 md:ml-64 p-4 md:p-8 lg:p-10 w-full overflow-hidden">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight">
               {t.welcome} <span className="text-[#D4AF37]">Tareq</span>
             </h2>
-            <p className="text-gray-500 text-sm mt-1">{t.subtitle}</p>
-          </motion.div>
-          <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+            <p className="text-gray-500 text-xs mt-1 uppercase tracking-widest">{t.subtitle}</p>
+          </div>
+          <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
-                 <p className="text-sm font-bold">Tarikul Islam Tareq</p>
-                 <p className="text-xs text-[#D4AF37] uppercase tracking-widest font-bold">Super Admin</p>
+                  <p className="text-sm font-bold">Tareq Islam</p>
+                  <p className="text-[10px] text-[#D4AF37] uppercase font-bold tracking-tighter">Super Admin</p>
               </div>
-              <div className="w-12 h-12 md:w-14 md:h-14 bg-[#D4AF37] rounded-2xl flex items-center justify-center text-black font-black text-xl shadow-lg border-2 border-white/10">TI</div>
+              <div className="w-12 h-12 bg-[#111111] border border-[#D4AF37]/20 rounded-2xl flex items-center justify-center text-[#D4AF37] font-black text-xl shadow-xl">TI</div>
           </div>
         </header>
 
         <AnimatePresence mode="wait">
-          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
             {activeTab === 'dashboard' && <Dashboard lang={lang} />}
             {activeTab === 'appointments' && <ManageAppointments lang={lang} />}
             {activeTab === 'reviews' && <ManageReviews lang={lang} />}
@@ -158,65 +152,52 @@ const AdminPanel = ({ lang = 'bn' }) => {
         </AnimatePresence>
 
         {activeTab === 'dashboard' && (
-          <section className="mt-12 bg-[#111111] rounded-[30px] md:rounded-[40px] border border-[#D4AF37]/10 overflow-hidden">
-            <div className="p-6 md:p-8 border-b border-[#D4AF37]/10 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <h3 className="text-lg md:text-xl font-bold uppercase tracking-tighter italic">{t.recent}</h3>
-              <button onClick={() => setActiveTab('appointments')} className="w-full sm:w-auto text-[#D4AF37] text-xs font-black uppercase tracking-widest border border-[#D4AF37]/30 px-6 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
+          <section className="mt-10 bg-[#111111] rounded-[35px] border border-white/5 overflow-hidden shadow-2xl">
+            <div className="p-6 md:p-8 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <h3 className="text-lg font-black uppercase tracking-widest italic text-[#D4AF37]">{t.recent}</h3>
+              <button onClick={() => setActiveTab('appointments')} className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest border border-[#D4AF37]/20 px-6 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
                 {t.viewAll}
               </button>
             </div>
             
-            <div className="overflow-x-auto w-full">
-              <table className="w-full text-left min-w-[500px]">
-                <thead className="bg-[#1a1a1a] text-gray-400 text-xs uppercase tracking-[2px] font-bold">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left min-w-[600px]">
+                <thead className="bg-black/30 text-gray-500 text-[10px] uppercase tracking-[2px] font-bold">
                   <tr>
-                    <th className="p-4 md:p-6">{t.table.name}</th>
-                    <th className="p-4 md:p-6">{t.table.service}</th>
-                    <th className="p-4 md:p-6">{t.table.status}</th>
-                    <th className="p-4 md:p-6 text-center">{t.table.action}</th>
+                    <th className="p-6">{t.table.name}</th>
+                    <th className="p-6">{t.table.info}</th>
+                    <th className="p-6">{t.table.status}</th>
+                    <th className="p-6 text-center">{t.table.action}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {loading ? (
-                    <tr><td colSpan="4" className="p-10 text-center text-gray-500">Loading appointments...</td></tr>
+                    <tr><td colSpan="4" className="p-10 text-center text-gray-600 animate-pulse uppercase tracking-widest text-xs">Loading Data...</td></tr>
                   ) : recentAppointments.map((appt) => (
-                    <tr key={appt._id} className="hover:bg-white/[0.02] transition-colors group">
-                      <td className="p-4 md:p-6 text-sm md:text-base">
-                        {editingId === appt._id ? (
-                          <input 
-                            className="bg-black border border-[#D4AF37] p-1 rounded text-white"
-                            value={editForm.name}
-                            onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                          />
-                        ) : (
-                          <span className="font-bold text-gray-200">{appt.name}</span>
-                        )}
+                    <tr key={appt._id} className="hover:bg-white/[0.01] transition-all">
+                      <td className="p-6">
+                        <p className="font-bold text-gray-200">{appt.name}</p>
+                        <p className="text-xs text-gray-500">{appt.phone}</p>
                       </td>
-                      <td className="p-4 md:p-6 text-sm md:text-base">
-                        {editingId === appt._id ? (
-                          <input 
-                            className="bg-black border border-[#D4AF37] p-1 rounded text-white"
-                            value={editForm.service}
-                            onChange={(e) => setEditForm({...editForm, service: e.target.value})}
-                          />
-                        ) : (
-                          <span className="text-gray-400">{appt.service}</span>
-                        )}
+                      <td className="p-6">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[#D4AF37] text-xs font-bold uppercase">{appt.service}</span>
+                          <div className="flex items-center gap-3 text-[10px] text-gray-500 uppercase">
+                            <span className="flex items-center gap-1"><Calendar size={10} /> {appt.appointmentDate || 'N/A'}</span>
+                            <span className="flex items-center gap-1"><Clock size={10} /> {appt.timeSlot || 'N/A'}</span>
+                          </div>
+                        </div>
                       </td>
-                      <td className="p-4 md:p-6">
-                        <span className="bg-yellow-500/10 text-yellow-500 px-3 md:px-4 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider">
+                      <td className="p-6">
+                        <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase ${appt.status === 'Confirmed' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
                           {appt.status || 'Pending'}
                         </span>
                       </td>
-                      <td className="p-4 md:p-6">
-                        <div className="flex justify-center gap-2 md:gap-3">
-                          {editingId === appt._id ? (
-                            <button onClick={() => handleSave(appt._id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-blue-500/10 text-blue-500 rounded-lg md:rounded-xl hover:bg-blue-500 hover:text-white transition-all"><Save size={16} /></button>
-                          ) : (
-                            <button onClick={() => startEdit(appt)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-yellow-500/10 text-yellow-500 rounded-lg md:rounded-xl hover:bg-yellow-500 hover:text-white transition-all"><Edit size={16} /></button>
-                          )}
-                          <button className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-green-500/10 text-green-500 rounded-lg md:rounded-xl hover:bg-green-500 hover:text-white transition-all"><CheckCircle size={16} /></button>
-                          <button onClick={() => handleDelete(appt._id)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-red-500/10 text-red-500 rounded-lg md:rounded-xl hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16} /></button>
+                      <td className="p-6">
+                        <div className="flex justify-center gap-2">
+                          <button onClick={() => startEdit(appt)} className="p-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-all"><Edit size={14} /></button>
+                          <button className="p-2 bg-green-500/10 text-green-500 rounded-lg hover:bg-green-500 hover:text-white transition-all"><CheckCircle size={14} /></button>
+                          <button onClick={() => handleDelete(appt._id)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
                         </div>
                       </td>
                     </tr>

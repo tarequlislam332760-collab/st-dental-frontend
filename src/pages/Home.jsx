@@ -3,11 +3,16 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SafeIcon from '../components/SafeIcon';
 
-// সংশোধিত এবং সঠিক ইম্পোর্ট পাথ
+// আগের ইম্পোর্টগুলো
 import Services from '../sections/Services';
 import DentalCare from '../sections/DentalCare';
 import Testimonials from '../sections/Testimonials';
 import Contact from '../sections/Contact';
+
+// নতুন ফিচারগুলোর ইম্পোর্ট (নিশ্চিত করুন এই ফাইলগুলো আপনার components ফোল্ডারে আছে)
+import TransformSlider from '../components/TransformSlider';
+import AppointmentForm from '../components/AppointmentForm';
+import WhatsAppWidget from '../components/WhatsAppWidget';
 
 const Home = ({ lang }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -15,11 +20,11 @@ const Home = ({ lang }) => {
   const heroData = {
     bn: [
       { 
-      title: "সেরা ডেন্টাল চিকিৎসা", 
-      sub: "Premium Dental Care", 
-      desc: "আধুনিক প্রযুক্তিতে আমরা নিশ্চিত করি আপনার সুন্দর হাসি।", 
-      img: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=1000",
-      link: "/dental-care"
+        title: "সেরা ডেন্টাল চিকিৎসা", 
+        sub: "Premium Dental Care", 
+        desc: "আধুনিক প্রযুক্তিতে আমরা নিশ্চিত করি আপনার সুন্দর হাসি।", 
+        img: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=1000",
+        link: "/dental-care"
       },
       { 
         title: "উজ্জ্বল ত্বকের পূর্ণ নিশ্চয়তা", 
@@ -47,12 +52,11 @@ const Home = ({ lang }) => {
     ]
   };
 
-  // ল্যাঙ্গুয়েজ ডাটা হ্যান্ডলিং
   const current = heroData[lang] ? heroData[lang][currentSlide] : heroData['en'][currentSlide];
 
   return (
     <div className="overflow-x-hidden">
-      {/* Hero Section - Background gradient changed to neutral */}
+      {/* Hero Section */}
       <section className="pt-32 lg:pt-0 lg:min-h-screen flex items-center bg-gradient-to-br from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-16 items-center w-full">
           
@@ -63,7 +67,6 @@ const Home = ({ lang }) => {
             animate={{ opacity: 1, y: 0 }} 
             transition={{ duration: 0.6 }}
           >
-            {/* Border color changed from green to golden */}
             <span className="text-[#D4AF37] font-black tracking-[5px] text-xs uppercase mb-6 block border-l-4 border-[#D4AF37] pl-4">
               {current.sub}
             </span>
@@ -74,11 +77,9 @@ const Home = ({ lang }) => {
               {current.desc}
             </p>
             <div className="flex flex-wrap gap-4">
-              {/* Button changed from green to black/golden */}
               <Link to={current.link} className="bg-[#1a1a1a] text-[#D4AF37] px-10 py-5 rounded-full font-bold shadow-2xl hover:bg-[#D4AF37] hover:text-black transition-all transform hover:-translate-y-1">
                 {lang === 'bn' ? 'বিস্তারিত দেখুন' : 'View Details'}
               </Link>
-              {/* Border hover changed from green to golden */}
               <button 
                 onClick={() => setCurrentSlide(currentSlide === 0 ? 1 : 0)} 
                 className="bg-white border-2 border-gray-100 px-6 py-5 rounded-full font-bold flex items-center gap-3 hover:border-[#D4AF37] transition-all"
@@ -100,7 +101,6 @@ const Home = ({ lang }) => {
               <img src={current.img} className="w-full h-full object-cover" alt="Clinic Care" />
             </motion.div>
             
-            {/* Floating Badge - Border and Icon color changed to golden */}
             <div className="absolute -bottom-6 -left-6 md:-bottom-10 md:-left-10 bg-white p-6 md:p-8 rounded-[30px] shadow-2xl z-20 border-b-8 border-[#D4AF37]">
               <div className="flex items-center gap-4">
                 <SafeIcon name="Stethoscope" size={28} className="text-[#D4AF37]" />
@@ -111,15 +111,29 @@ const Home = ({ lang }) => {
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
-      {/* নিচের সেকশনগুলো সিরিয়াল অনুযায়ী */}
+      {/* ১. সেবা সমূহ */}
       <Services lang={lang} />
+
+      {/* ২. ডেন্টাল এবং ফেসিয়াল ট্রান্সফরমেশন স্লাইডার (নতুন যোগ করা হয়েছে) */}
+      <TransformSlider lang={lang} />
+
+      {/* ৩. ডেন্টাল কেয়ার ডিটেইলস */}
       <DentalCare lang={lang} />
+
+      {/* ৪. নতুন এবং উন্নত অ্যাপয়েন্টমেন্ট ফর্ম (নতুন যোগ করা হয়েছে) */}
+      <AppointmentForm lang={lang} />
+
+      {/* ৫. ইউজার রিভিউ */}
       <Testimonials lang={lang} />
+
+      {/* ৬. কন্টাক্ট সেকশন */}
       <Contact lang={lang} />
+
+      {/* ৭. ফ্লোটিং হোয়াটসঅ্যাপ বাটন (সব সময় স্ক্রিনে থাকবে) */}
+      <WhatsAppWidget lang={lang} />
     </div>
   );
 };

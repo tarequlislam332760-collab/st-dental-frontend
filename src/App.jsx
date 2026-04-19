@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // --- পেজ এবং সেকশন ইম্পোর্ট ---
 import Home from './pages/Home';
+import WhatsAppWidget from './components/WhatsAppWidget';
 import Appointment from './pages/Appointment';
 import Services from './sections/Services';
 import About from './sections/About';
@@ -193,6 +194,7 @@ const AppContent = () => {
         )}
       </AnimatePresence>
 <Routes>
+  <WhatsAppWidget />
   {/* পাবলিক রাউটগুলো */}
   <Route path="/" element={<Home lang={lang} />} /> 
   <Route path="/services" element={<Services lang={lang} />} />
