@@ -11,7 +11,7 @@ import Contact from '../sections/Contact';
 
 // নতুন ফিচারগুলোর ইম্পোর্ট (নিশ্চিত করুন এই ফাইলগুলো আপনার components ফোল্ডারে আছে)
 import TransformSlider from '../components/TransformSlider';
-import AppointmentForm from '../components/AppointmentForm';
+import Appointment from '../components/Appointment';
 import WhatsAppWidget from '../components/WhatsAppWidget';
 
 const Home = ({ lang }) => {
@@ -124,7 +124,7 @@ const Home = ({ lang }) => {
       <DentalCare lang={lang} />
 
       {/* ৪. নতুন এবং উন্নত অ্যাপয়েন্টমেন্ট ফর্ম (নতুন যোগ করা হয়েছে) */}
-      <AppointmentForm lang={lang} />
+      <Appointment lang={lang} />
 
       {/* ৫. ইউজার রিভিউ */}
       <Testimonials lang={lang} />
