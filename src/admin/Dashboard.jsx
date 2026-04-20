@@ -8,12 +8,12 @@ const Dashboard = ({ lang }) => {
     newReviews: 0,
     totalPatients: 0
   });
-  const [appointments, setAppointments] = useState([]); // অ্যাপয়েন্টমেন্ট ডাটা রাখার জন্য
+  const [appointments, setAppointments] = useState([]); // সাম্প্রতিক শিডিউলের জন্য স্টেট
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [tempData, setTempData] = useState({});
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       // ১. ড্যাশবোর্ড স্ট্যাটাস ফেচ করা
@@ -21,18 +21,18 @@ const Dashboard = ({ lang }) => {
       setStatsData(resStats.data);
       setTempData(resStats.data);
 
-      // ২. রিসেন্ট শিডিউলের জন্য অ্যাপয়েন্টমেন্ট ফেচ করা
+      // ২. সাম্প্রতিক শিডিউলের জন্য অ্যাপয়েন্টমেন্ট ফেচ করা
       const resApps = await axios.get('https://st-dental-backend.vercel.app/api/appointments');
       setAppointments(resApps.data);
 
       setLoading(false);
     } catch (err) {
-      console.error("Dashboard data fetch error:", err);
+      console.error("Dashboard fetch error:", err);
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchStats(); }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const handleUpdate = async () => {
     try {
@@ -50,8 +50,8 @@ const Dashboard = ({ lang }) => {
   };
 
   const t = {
-    en: { title: "Overview", s1: "Total Appointments", s2: "New Reviews", s3: "Total Patients", edit: "Edit Stats", save: "Save", cancel: "Cancel", recent: "Recent Schedule", viewAll: "View All", noData: "No appointments today" },
-    bn: { title: "সারসংক্ষেপ", s1: "মোট অ্যাপয়েন্টমেন্ট", s2: "নতুন রিভিউ", s3: "মোট রোগী", edit: "তথ্য পরিবর্তন", save: "সেভ করুন", cancel: "বাতিল", recent: "রিসেন্ট শিডিউল", viewAll: "সবগুলো দেখুন", noData: "আজ কোনো শিডিউল নেই" }
+    en: { title: "Overview", s1: "Total Appointments", s2: "New Reviews", s3: "Total Patients", edit: "Edit Stats", save: "Save", cancel: "Cancel", recent: "Recent Schedule", viewAll: "View All", patient: "Patient", service: "Service & Time" },
+    bn: { title: "সারসংক্ষেপ", s1: "মোট অ্যাপয়েন্টমেন্ট", s2: "নতুন রিভিউ", s3: "মোট রোগী", edit: "তথ্য পরিবর্তন", save: "সেভ করুন", cancel: "বাতিল", recent: "সাম্প্রতিক শিডিউল", viewAll: "সব দেখুন", patient: "রোগী", service: "সেবা ও সময়" }
   }[lang];
 
   const stats = [
@@ -62,101 +62,89 @@ const Dashboard = ({ lang }) => {
 
   return (
     <div className="w-full space-y-10">
-      {/* Overview Header */}
+      {/* Overview Section */}
       <div className="flex justify-between items-center mb-6 md:mb-8">
         <h3 className="text-xl md:text-2xl font-black text-[#D4AF37] uppercase tracking-tighter italic">
           {t.title}
         </h3>
-        
         {!isEditing ? (
-          <button 
-            onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 bg-[#D4AF37]/10 text-[#D4AF37] px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-[#D4AF37] hover:text-black transition-all"
-          >
+          <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 bg-[#D4AF37]/10 text-[#D4AF37] px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-[#D4AF37] hover:text-black transition-all">
             <Edit3 size={14} /> {t.edit}
           </button>
         ) : (
           <div className="flex gap-2">
-            <button 
-              onClick={handleUpdate}
-              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest"
-            >
+            <button onClick={handleUpdate} className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
               <Save size={14} /> {t.save}
             </button>
-            <button 
-              onClick={() => setIsEditing(false)}
-              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest"
-            >
+            <button onClick={() => setIsEditing(false)} className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
               <X size={14} /> {t.cancel}
             </button>
           </div>
         )}
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {stats.map((s, i) => (
           <div key={i} className="bg-[#111111] p-5 md:p-6 rounded-[24px] md:rounded-3xl border border-[#D4AF37]/10 relative group hover:border-[#D4AF37]/30 transition-all duration-300">
             <s.icon className="text-[#D4AF37] mb-3 md:mb-4" size={20} />
             <p className="text-gray-500 text-[10px] md:text-xs uppercase font-bold mb-1">{s.label}</p>
-            
             {isEditing ? (
-              <input 
-                type="number"
-                value={tempData[s.key]}
-                onChange={(e) => setTempData({...tempData, [s.key]: parseInt(e.target.value) || 0})}
-                className="bg-black/50 border border-[#D4AF37]/50 text-[#D4AF37] text-2xl md:text-3xl font-black w-full rounded-lg px-2 py-1 outline-none focus:border-[#D4AF37]"
-              />
+              <input type="number" value={tempData[s.key]} onChange={(e) => setTempData({...tempData, [s.key]: parseInt(e.target.value) || 0})} className="bg-black/50 border border-[#D4AF37]/50 text-[#D4AF37] text-2xl md:text-3xl font-black w-full rounded-lg px-2 py-1 outline-none" />
             ) : (
-              <h4 className="text-2xl md:text-4xl font-black text-white">
-                {loading ? "..." : s.value.toLocaleString()}
-              </h4>
+              <h4 className="text-2xl md:text-4xl font-black text-white">{loading ? "..." : s.value.toLocaleString()}</h4>
             )}
           </div>
         ))}
       </div>
 
-      {/* Recent Schedule Section (এটি নতুন যোগ করা হয়েছে) */}
+      {/* সাম্প্রতিক শিডিউল সেকশন (নিচের অংশ) */}
       <div className="bg-[#111111] rounded-[35px] border border-white/5 overflow-hidden shadow-2xl">
         <div className="p-6 border-b border-white/5 flex justify-between items-center">
           <h3 className="text-[#D4AF37] font-black uppercase tracking-widest text-sm italic">
             {t.recent}
           </h3>
-          <button className="text-[10px] font-bold uppercase text-gray-500 hover:text-white transition-all">
+          <button className="bg-white/5 text-[10px] font-bold uppercase text-gray-400 px-4 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
             {t.viewAll}
           </button>
         </div>
         
-        <div className="p-2">
-          {loading ? (
-            <p className="p-10 text-center text-gray-600 uppercase text-[10px] tracking-widest">Loading...</p>
-          ) : appointments.length > 0 ? (
-            <div className="grid grid-cols-1 divide-y divide-white/5">
-              {appointments.slice(0, 5).map((app) => (
-                <div key={app._id} className="p-4 flex items-center justify-between hover:bg-white/[0.02] transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] font-black text-xs">
-                      {app.name.charAt(0)}
-                    </div>
-                    <div>
-                      <h5 className="text-white text-sm font-bold">{app.name}</h5>
-                      <p className="text-[10px] text-gray-500 uppercase font-bold">{app.service}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="flex items-center gap-1 text-[#D4AF37] text-[10px] font-black uppercase">
-                      <Clock size={10} /> {app.time}
-                    </span>
-                    <span className="text-[9px] text-gray-600 font-bold uppercase">{app.date}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="p-10 text-center text-gray-600 uppercase text-[10px] tracking-widest">
-              {t.noData}
-            </p>
-          )}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-black/30 text-gray-600 text-[10px] uppercase font-bold">
+              <tr>
+                <th className="p-6">{t.patient}</th>
+                <th className="p-6">{t.service}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {loading ? (
+                <tr><td colSpan="2" className="p-10 text-center text-gray-600 text-xs uppercase tracking-widest">Loading...</td></tr>
+              ) : appointments.length > 0 ? (
+                appointments.slice(0, 5).map((app) => (
+                  <tr key={app._id} className="hover:bg-white/[0.02] transition-all group">
+                    <td className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] font-black text-xs group-hover:bg-[#D4AF37] group-hover:text-black transition-all">
+                          {app.name.charAt(0)}
+                        </div>
+                        <span className="text-white font-bold text-sm">{app.name}</span>
+                      </div>
+                    </td>
+                    <td className="p-6">
+                      <div className="flex flex-col">
+                        <span className="text-gray-400 text-xs font-bold uppercase">{app.service}</span>
+                        <span className="text-[#D4AF37] text-[10px] font-black mt-1 flex items-center gap-1">
+                          <Clock size={10} /> {app.time} — {app.date}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan="2" className="p-10 text-center text-gray-600 text-xs uppercase tracking-widest italic">No recent schedules</td></tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
