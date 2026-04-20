@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next'; // এটি নতুন যোগ করা হয়েছে
 import SafeIcon from '../components/SafeIcon';
 
 // আগের ইম্পোর্টগুলো
@@ -10,17 +9,13 @@ import DentalCare from '../sections/DentalCare';
 import Testimonials from '../sections/Testimonials';
 import Contact from '../sections/Contact';
 
-// নতুন ফিচারগুলোর ইম্পোর্ট
+// নতুন ফিচারগুলোর ইম্পোর্ট (নিশ্চিত করুন এই ফাইলগুলো আপনার components ফোল্ডারে আছে)
 import TransformSlider from '../components/TransformSlider';
 import Appointment from '../pages/Appointment';
 import WhatsAppWidget from '../components/WhatsAppWidget';
 
-const Home = () => {
-  const { i18n } = useTranslation(); // গ্লোবাল ল্যাঙ্গুয়েজ স্টেট ধরার জন্য
+const Home = ({ lang }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  // i18n থেকে বর্তমান ল্যাঙ্গুয়েজ নেওয়া (bn বা en)
-  const currentLang = i18n.language?.split('-')[0] || 'en';
 
   const heroData = {
     bn: [
@@ -57,8 +52,7 @@ const Home = () => {
     ]
   };
 
-  // বর্তমানে i18n এ যা সেট করা আছে সেই অনুযায়ী ডেটা সিলেক্ট করা
-  const current = heroData[currentLang] ? heroData[currentLang][currentSlide] : heroData['en'][currentSlide];
+  const current = heroData[lang] ? heroData[lang][currentSlide] : heroData['en'][currentSlide];
 
   return (
     <div className="overflow-x-hidden">
@@ -68,7 +62,7 @@ const Home = () => {
           
           {/* Text Content */}
           <motion.div 
-            key={currentSlide + currentLang} // key-তে ল্যাঙ্গুয়েজ যোগ করা হয়েছে যাতে ভাষা পাল্টানো মাত্রই অ্যানিমেশন হয়
+            key={currentSlide + lang} 
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ duration: 0.6 }}
@@ -84,13 +78,13 @@ const Home = () => {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to={current.link} className="bg-[#1a1a1a] text-[#D4AF37] px-10 py-5 rounded-full font-bold shadow-2xl hover:bg-[#D4AF37] hover:text-black transition-all transform hover:-translate-y-1">
-                {currentLang === 'bn' ? 'বিস্তারিত দেখুন' : 'View Details'}
+                {lang === 'bn' ? 'বিস্তারিত দেখুন' : 'View Details'}
               </Link>
               <button 
                 onClick={() => setCurrentSlide(currentSlide === 0 ? 1 : 0)} 
                 className="bg-white border-2 border-gray-100 px-6 py-5 rounded-full font-bold flex items-center gap-3 hover:border-[#D4AF37] transition-all"
               >
-                {currentLang === 'bn' ? 'অন্যান্য সেবা' : 'Other Services'} 
+                {lang === 'bn' ? 'অন্যান্য সেবা' : 'Other Services'} 
                 <SafeIcon name="ArrowRight" size={18} />
               </button>
             </div>
@@ -120,14 +114,26 @@ const Home = () => {
         </div>
       </section>
 
-      {/* নিচের সব সেকশনে currentLang পাঠানো হচ্ছে */}
-      <Services lang={currentLang} />
-      <TransformSlider lang={currentLang} />
-      <DentalCare lang={currentLang} />
-      <Appointment lang={currentLang} />
-      <Testimonials lang={currentLang} />
-      <Contact lang={currentLang} />
-      <WhatsAppWidget lang={currentLang} />
+      {/* ১. সেবা সমূহ */}
+      <Services lang={lang} />
+
+      {/* ২. ডেন্টাল এবং ফেসিয়াল ট্রান্সফরমেশন স্লাইডার (নতুন যোগ করা হয়েছে) */}
+      <TransformSlider lang={lang} />
+
+      {/* ৩. ডেন্টাল কেয়ার ডিটেইলস */}
+      <DentalCare lang={lang} />
+
+      {/* ৪. নতুন এবং উন্নত অ্যাপয়েন্টমেন্ট ফর্ম (নতুন যোগ করা হয়েছে) */}
+      <Appointment lang={lang} />
+
+      {/* ৫. ইউজার রিভিউ */}
+      <Testimonials lang={lang} />
+
+      {/* ৬. কন্টাক্ট সেকশন */}
+      <Contact lang={lang} />
+
+      {/* ৭. ফ্লোটিং হোয়াটসঅ্যাপ বাটন (সব সময় স্ক্রিনে থাকবে) */}
+      <WhatsAppWidget lang={lang} />
     </div>
   );
 };
