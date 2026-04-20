@@ -15,7 +15,7 @@ import DentalCare from './sections/DentalCare';
 import SkinCare from './sections/SkinCare';
 import Testimonials from './sections/Testimonials';
 
-// বানানের দিকে খেয়াল রাখুন: Slider নাকি Sidebar
+// বানানের দিকে খেয়াল রাখুন: Slider নাকি Sidebar
 import TransformSlider from "./components/TransformSlider.jsx";
 import BeforeAfterSlider from "./components/BeforeAfterSlider.jsx";
 
@@ -52,7 +52,7 @@ const translations = {
     ]
   },
   ar: { home: "الصفحة الرئيسية", services: "خدمات", about: "حول", contact: "اتصال", dental: "عناية بالأسنان", skin: "العناية بالبشرة", treatment: "علاج", testimonials: "شهادات", btn: "حجز موعد", call: "اتصل الآن", whatsapp: "واتساب", blog: "مدونة", transform: "تحويل", beforeAfter: "قبل وبعد" },
-  hi: { home: "होम", services: "सेवाएं", about: "हमारे बारे में", contact: "संपর্ক", dental: "দন্ত চিকিৎসা", skin: "ত্বचा की देखभाल", treatment: "उपचार", testimonials: "प्रमाणपत्र", btn: "अपॉइंटमेंट लें", call: "अभी কল करें", whatsapp: "व्हाट्सएप", blog: "ब्लॉग", transform: "ट्रांसफॉर्म", beforeAfter: "पहले और बाद में" },
+  hi: { home: "होम", services: "सेवाएं", about: "हमारे बारे में", contact: "संपर्क", dental: "দন্ত চিকিৎসা", skin: "ত্বचा की देखभाल", treatment: "उपचार", testimonials: "प्रमाणपत्र", btn: "अपॉइंटमेंट लें", call: "अभी কল करें", whatsapp: "व्हाट्सएप", blog: "ब्लॉग", transform: "ट्रांसफॉर्म", beforeAfter: "पहले और बाद में" },
   es: { home: "Inicio", services: "Servicios", about: "Nosotros", contact: "Contacto", dental: "Cuidado Dental", skin: "Cuidado Piel", treatment: "Tratamiento", testimonials: "Testimonios", btn: "Reservar", call: "Llamar", whatsapp: "WhatsApp", blog: "Blog", transform: "Transformar", beforeAfter: "Antes y Después" },
   fr: { home: "Accueil", services: "Services", about: "À propos", contact: "Contact", dental: "Soin Dentaire", skin: "Soin Peau", treatment: "Traitement", testimonials: "Témoignages", btn: "Réserver", call: "Appeler", whatsapp: "WhatsApp", blog: "Blog", transform: "Transformer", beforeAfter: "Avant/Après" },
   de: { home: "Startseite", services: "Dienste", about: "Über uns", contact: "Kontakt", dental: "Zahnpflege", skin: "Hautpflege", treatment: "Behandlung", testimonials: "Referenzen", btn: "Buchen", call: "Anrufen", whatsapp: "WhatsApp", blog: "Blog", transform: "Verwandeln", beforeAfter: "Vorher/Nachher" },
@@ -212,8 +212,8 @@ const AppContent = () => {
         <Route path="/contact" element={<Contact lang={lang} />} />
         <Route path="/dental-care" element={<DentalCare lang={lang} />} />
         <Route path="/skin-care" element={<SkinCare lang={lang} />} />
-      <Route path="/transform" element={<TransformSlider lang={lang} />} />
-  <Route path="/before-after" element={<BeforeAfterSlider lang={lang} />} />
+        <Route path="/transform" element={<TransformSlider lang={lang} />} />
+        <Route path="/before-after" element={<BeforeAfterSlider lang={lang} />} />
         <Route path="/appointment" element={<Appointment lang={lang} />} />
         <Route path="/testimonials" element={<Testimonials lang={lang} />} />
         

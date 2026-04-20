@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Star, MessageSquare 
 } from 'lucide-react';
 
-const Navbar = ({ scrolled }) => {
+const Navbar = ({ scrolled, setLang }) => { // এখানে setLang প্রপস হিসেবে নেওয়া হয়েছে
   const { t, i18n } = useTranslation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -28,7 +28,14 @@ const Navbar = ({ scrolled }) => {
   ];
 
   const changeLanguage = (code) => {
-    i18n.changeLanguage(code.toLowerCase());
+    const lowerCode = code.toLowerCase();
+    i18n.changeLanguage(lowerCode);
+    
+    // মেইন ল্যাঙ্গুয়েজ স্টেট আপডেট করা (Home.jsx এর জন্য)
+    if (setLang) {
+      setLang(lowerCode);
+    }
+    
     document.body.dir = code === 'AR' ? 'rtl' : 'ltr';
     setIsSidebarOpen(false);
   };
@@ -138,15 +145,13 @@ const Navbar = ({ scrolled }) => {
         </div>
       </nav>
 
-      {/* 📱 ৪. মোবাইল সাইডবার (Sidebar) */}
+      {/* 📱 ৪. মোবাইল সাইডবার */}
       <div className={`fixed inset-0 z-[90] transition-all duration-500 ${isSidebarOpen ? 'visible' : 'invisible'}`}>
-        {/* Overlay */}
         <div 
           className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-500 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}
           onClick={() => setIsSidebarOpen(false)}
         ></div>
         
-        {/* Sidebar Content */}
         <div className={`absolute top-0 right-0 h-full w-[80%] max-w-xs bg-white shadow-2xl transition-transform duration-500 transform ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'} p-8 flex flex-col`}>
           <div className="mt-20 flex flex-col gap-6">
             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[4px] border-b border-gray-100 pb-2">Main Menu</h3>
@@ -165,13 +170,13 @@ const Navbar = ({ scrolled }) => {
             
             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[4px] border-b border-gray-100 pb-2">Language</h3>
             <div className="grid grid-cols-2 gap-2">
-              {languages.map((lang) => (
+              {languages.map((langItem) => (
                 <button 
-                  key={lang.code}
-                  onClick={() => changeLanguage(lang.code)}
-                  className={`text-[10px] font-black p-2 rounded-lg border ${i18n.language.toUpperCase() === lang.code ? 'bg-[#D4AF37] border-[#D4AF37] text-white' : 'border-gray-100 text-gray-600'}`}
+                  key={langItem.code}
+                  onClick={() => changeLanguage(langItem.code)}
+                  className={`text-[10px] font-black p-2 rounded-lg border ${i18n.language.toUpperCase() === langItem.code ? 'bg-[#D4AF37] border-[#D4AF37] text-white' : 'border-gray-100 text-gray-600'}`}
                 >
-                  {lang.name}
+                  {langItem.name}
                 </button>
               ))}
             </div>

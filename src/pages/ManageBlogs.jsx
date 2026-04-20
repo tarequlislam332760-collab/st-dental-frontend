@@ -17,7 +17,6 @@ const ManageBlogs = ({ lang }) => {
 
     const API_URL = 'https://st-dental-backend.vercel.app/api/blogs';
 
-    // ১. ব্লগগুলো লোড করা
     const fetchBlogs = async () => {
         try {
             setLoading(true);
@@ -34,25 +33,33 @@ const ManageBlogs = ({ lang }) => {
         fetchBlogs();
     }, []);
 
-    // ২. ব্লগ সেভ বা আপডেট করা
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // ব্যাকএন্ডের blogController-এর সাথে মিল রেখে ডেটা অবজেক্ট তৈরি
+        const blogData = {
+            title: formData.title,
+            description: formData.content, // কন্ট্রোলারের description ফিল্ডে পাঠানো হচ্ছে
+            image: formData.image,
+            author: formData.author
+        };
+
         try {
             if (editingBlog) {
-                await axios.put(`${API_URL}/${editingBlog._id}`, formData);
+                await axios.put(`${API_URL}/${editingBlog._id}`, blogData);
             } else {
-                await axios.post(API_URL, formData);
+                await axios.post(API_URL, blogData);
             }
             setIsModalOpen(false);
             setEditingBlog(null);
             setFormData({ title: '', content: '', image: '', author: 'Admin' });
             fetchBlogs();
         } catch (err) {
-            alert("Action failed!");
+            console.error(err);
+            alert("Action failed! Check Console.");
         }
     };
 
-    // ৩. ব্লগ ডিলিট করা
     const handleDelete = async (id) => {
         if (window.confirm(lang === 'bn' ? "আপনি কি এটি ডিলিট করতে চান?" : "Are you sure?")) {
             try {
@@ -66,7 +73,12 @@ const ManageBlogs = ({ lang }) => {
 
     const openEditModal = (blog) => {
         setEditingBlog(blog);
-        setFormData({ title: blog.title, content: blog.content, image: blog.image, author: blog.author });
+        setFormData({ 
+            title: blog.title, 
+            content: blog.description || blog.content, // description সাপোর্ট করা হলো
+            image: blog.image, 
+            author: blog.author || 'Admin' 
+        });
         setIsModalOpen(true);
     };
 
@@ -84,7 +96,6 @@ const ManageBlogs = ({ lang }) => {
                 </button>
             </div>
 
-            {/* ব্লগ লিস্ট টেবিল */}
             <div className="bg-[#111111] rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
                 <table className="w-full text-left">
                     <thead className="bg-black/40 text-gray-500 text-[10px] uppercase tracking-widest font-bold">
@@ -109,7 +120,7 @@ const ManageBlogs = ({ lang }) => {
                                     </div>
                                 </td>
                                 <td className="p-6">
-                                    <p className="text-sm text-gray-500 truncate max-w-xs">{blog.content}</p>
+                                    <p className="text-sm text-gray-500 truncate max-w-xs">{blog.description || blog.content}</p>
                                 </td>
                                 <td className="p-6">
                                     <div className="flex justify-center gap-3">
@@ -127,7 +138,6 @@ const ManageBlogs = ({ lang }) => {
                 </table>
             </div>
 
-            {/* এডিট/অ্যাড মডাল */}
             <AnimatePresence>
                 {isModalOpen && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">

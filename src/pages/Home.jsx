@@ -13,7 +13,7 @@ import Contact from '../sections/Contact';
 import TransformSlider from '../components/TransformSlider';
 import Appointment from '../pages/Appointment';
 import WhatsAppWidget from '../components/WhatsAppWidget';
-import Blog from '../pages/Blog'; // ব্লগ পেজটি ইম্পোর্ট করা হয়েছে
+import Blog from '../pages/Blog'; 
 
 const Home = ({ lang }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -60,8 +60,6 @@ const Home = ({ lang }) => {
       {/* Hero Section */}
       <section className="pt-32 lg:pt-0 lg:min-h-screen flex items-center bg-gradient-to-br from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-16 items-center w-full">
-          
-          {/* Text Content */}
           <motion.div 
             key={currentSlide + lang} 
             initial={{ opacity: 0, y: 20 }} 
@@ -91,7 +89,6 @@ const Home = ({ lang }) => {
             </div>
           </motion.div>
 
-          {/* Image Content */}
           <div className="relative">
             <motion.div 
               key={currentSlide} 
@@ -101,7 +98,6 @@ const Home = ({ lang }) => {
             >
               <img src={current.img} className="w-full h-full object-cover" alt="Clinic Care" />
             </motion.div>
-            
             <div className="absolute -bottom-6 -left-6 md:-bottom-10 md:-left-10 bg-white p-6 md:p-8 rounded-[30px] shadow-2xl z-20 border-b-8 border-[#D4AF37]">
               <div className="flex items-center gap-4">
                 <SafeIcon name="Stethoscope" size={28} className="text-[#D4AF37]" />
@@ -115,28 +111,14 @@ const Home = ({ lang }) => {
         </div>
       </section>
 
-      {/* ১. সেবা সমূহ */}
+      {/* সব সেকশনে ল্যাঙ্গুয়েজ পাস করা হয়েছে */}
       <Services lang={lang} />
-
-      {/* ২. ডেন্টাল এবং ফেসিয়াল ট্রান্সফরমেশন স্লাইডার */}
       <TransformSlider lang={lang} />
-
-      {/* ৩. ডেন্টাল কেয়ার ডিটেইলস */}
       <DentalCare lang={lang} />
-
-      {/* ৪. নতুন এবং উন্নত অ্যাপয়েন্টমেন্ট ফর্ম */}
       <Appointment lang={lang} />
-
-      {/* ৫. ইউজার রিভিউ */}
       <Testimonials lang={lang} />
-
-      {/* ব্লগ সেকশন (Testimonials এবং Contact এর মাঝে যুক্ত করা হয়েছে) */}
-      <Blog lang={lang} />
-
-      {/* ৬. কন্টাক্ট সেকশন */}
+      <Blog lang={lang} /> 
       <Contact lang={lang} />
-
-      {/* ৭. ফ্লোটিং হোয়াটসঅ্যাপ বাটন */}
       <WhatsAppWidget lang={lang} />
     </div>
   );
