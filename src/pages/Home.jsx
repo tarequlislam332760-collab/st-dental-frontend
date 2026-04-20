@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'; // i18next যুক্ত করা হয়েছে
 import SafeIcon from '../components/SafeIcon';
 
 // সেকশন ইম্পোর্ট
@@ -17,9 +17,10 @@ import WhatsAppWidget from '../components/WhatsAppWidget';
 import Blog from '../pages/Blog'; // ব্লগ পেজটি ইম্পোর্ট করা হয়েছে
 
 const Home = () => {
-  const { i18n } = useTranslation();
+  const { i18n } = useTranslation(); // গ্লোবাল ল্যাঙ্গুয়েজ স্টেট ধরার জন্য
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // i18n থেকে বর্তমান ভাষা (bn অথবা en) নেওয়া হচ্ছে
   const activeLang = i18n.language?.split('-')[0] || 'en';
 
   const heroData = {
@@ -66,7 +67,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-16 items-center w-full">
           
           <motion.div 
-            key={currentSlide + activeLang} 
+            key={currentSlide + activeLang} // ল্যাঙ্গুয়েজ অনুযায়ী অ্যানিমেশন ট্রিগার করবে
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ duration: 0.6 }}
