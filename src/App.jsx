@@ -29,7 +29,7 @@ const SafeIcon = ({ name, size = 20, className = "" }) => {
   return <IconComponent size={size} className={className} />;
 };
 
-// --- ১০টি ভাষার ডাটাবেস ---
+// --- ১০টি ভাষার ডাটাবেস (Blog & Slider fixed for all languages) ---
 const translations = {
   bn: {
     home: "হোম", services: "সেবা", about: "আমাদের সম্পর্কে", contact: "যোগাযোগ",
@@ -94,6 +94,7 @@ const AppContent = () => {
     return () => window.removeEventListener('click', handleClickOutside);
   }, []);
 
+  // Use a fallback to 'en' if the current lang isn't in translations
   const t = translations[lang] || translations['en'];
 
   return (

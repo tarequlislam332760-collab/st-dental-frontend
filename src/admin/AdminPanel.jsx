@@ -7,7 +7,7 @@ import axios from 'axios';
 import Dashboard from './Dashboard';
 import ManageAppointments from './ManageAppointments';
 import ManageReviews from './ManageReviews';
-import ManageBlogs from './ManageBlogs'; // এখানে ইম্পোর্ট করা হলো
+import ManageBlogs from './ManageBlogs'; 
 
 const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   const [lang, setLang] = useState(initialLang);
@@ -16,10 +16,13 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // আপনার Render ব্যাকএন্ড ইউআরএল এখানে দিন
+  const API_URL = "https://st-dental-backend.onrender.com/api";
+
   const fetchRecentData = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('https://st-dental-backend.vercel.app/api/appointments');
+      const res = await axios.get(`${API_URL}/appointments`);
       setRecentAppointments(res.data.slice(0, 8)); 
       setLoading(false);
     } catch (err) {
@@ -67,7 +70,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   const handleDelete = async (id) => {
     if(window.confirm(t.deleteConfirm)) {
       try {
-        await axios.delete(`https://st-dental-backend.vercel.app/api/appointments/${id}`);
+        await axios.delete(`${API_URL}/appointments/${id}`);
         fetchRecentData();
       } catch (err) {
         alert("Delete failed!");
