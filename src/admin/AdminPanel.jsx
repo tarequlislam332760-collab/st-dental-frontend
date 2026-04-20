@@ -10,15 +10,11 @@ import ManageReviews from './ManageReviews';
 import ManageBlogs from './ManageBlogs'; 
 
 const AdminPanel = ({ lang: initialLang = 'bn' }) => {
-  // ১. ল্যাঙ্গুয়েজকে স্টেটে রাখা হয়েছে যাতে চেঞ্জ করলে সব জায়গায় আপডেট হয়
   const [lang, setLang] = useState(initialLang);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [recentAppointments, setRecentAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ name: '', service: '', timeSlot: '', appointmentDate: '' });
 
   const fetchRecentData = async () => {
     try {
@@ -42,23 +38,27 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   };
 
   const toggleLang = () => {
-    setLang(prev => prev === 'bn' ? 'en' : 'bn');
+    setLang(prev => (prev === 'bn' ? 'en' : 'bn'));
   };
 
   const t = {
     en: {
       dash: "Dashboard", appt: "Appointments", rev: "Reviews", blog: "Blogs", logout: "Logout",
       welcome: "Welcome back,", subtitle: "Manage your dental & facial clinic.",
-      recent: "Recent Schedule", viewAll: "View All",
+      recent: "Recent Schedule", viewAll: "View All", loading: "Loading Data...",
+      noDate: "No Date", noTime: "No Time",
       table: { name: "Patient", info: "Service & Time", status: "Status", action: "Action" },
-      deleteConfirm: "Are you sure you want to delete?"
+      deleteConfirm: "Are you sure you want to delete?",
+      superAdmin: "Super Admin"
     },
     bn: {
       dash: "ড্যাশবোর্ড", appt: "অ্যাপয়েন্টমেন্ট", rev: "রিভিউ", blog: "ব্লগ", logout: "লগআউট",
       welcome: "স্বাগতম,", subtitle: "ডেন্টাল এবং ফেসিয়াল ক্লিনিক পরিচালনা করুন।",
-      recent: "সাম্প্রতিক শিডিউল", viewAll: "সব দেখুন",
+      recent: "সাম্প্রতিক শিডিউল", viewAll: "সব দেখুন", loading: "লোড হচ্ছে...",
+      noDate: "তারিখ নেই", noTime: "সময় নেই",
       table: { name: "রোগী", info: "সেবা ও সময়", status: "অবস্থা", action: "অ্যাকশন" },
-      deleteConfirm: "আপনি কি এটি ডিলিট করতে চান?"
+      deleteConfirm: "আপনি কি এটি ডিলিট করতে চান?",
+      superAdmin: "সুপার এডমিন"
     }
   }[lang];
 
@@ -115,8 +115,8 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
         </nav>
 
         {/* Language Switcher in Sidebar (Desktop) */}
-        <button onClick={toggleLang} className="mb-4 flex items-center gap-4 px-4 py-3 text-[#D4AF37] bg-white/5 rounded-xl font-bold transition-all border border-white/5 hover:border-[#D4AF37]/30 uppercase text-xs tracking-widest">
-           <Globe size={18} /> {lang === 'bn' ? 'English Language' : 'বাংলা ভাষা'}
+        <button onClick={toggleLang} className="mb-4 flex items-center gap-4 px-4 py-3 text-[#D4AF37] bg-white/5 rounded-xl font-bold transition-all border border-white/5 hover:border-[#D4AF37]/30 uppercase text-[10px] tracking-widest">
+           <Globe size={16} /> {lang === 'bn' ? 'English Language' : 'বাংলা ভাষা'}
         </button>
 
         <button onClick={handleLogout} className="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-xl font-bold transition-all">
@@ -136,14 +136,20 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
           <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
                   <p className="text-sm font-bold">Tareq Islam</p>
-                  <p className="text-[10px] text-[#D4AF37] uppercase font-bold tracking-tighter">Super Admin</p>
+                  <p className="text-[10px] text-[#D4AF37] uppercase font-bold tracking-tighter">{t.superAdmin}</p>
               </div>
               <div className="w-12 h-12 bg-[#111111] border border-[#D4AF37]/20 rounded-2xl flex items-center justify-center text-[#D4AF37] font-black text-xl shadow-xl">TI</div>
           </div>
         </header>
 
+        {/* Sub-Components with Dynamic Lang */}
         <AnimatePresence mode="wait">
-          <motion.div key={activeTab + lang} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <motion.div 
+            key={activeTab + lang} // এখানে ল্যাঙ্গুয়েজ যোগ করায় ট্যাব বা ভাষা বদলালে কন্টেন্ট রিফ্রেশ হবে
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.3 }}
+          >
             {activeTab === 'dashboard' && <Dashboard lang={lang} />}
             {activeTab === 'appointments' && <ManageAppointments lang={lang} />}
             {activeTab === 'reviews' && <ManageReviews lang={lang} />}
@@ -151,9 +157,9 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
           </motion.div>
         </AnimatePresence>
 
+        {/* Recent Schedule Table - Dashboard view only */}
         {activeTab === 'dashboard' && (
           <section className="mt-10 bg-[#111111] rounded-[35px] border border-white/5 overflow-hidden shadow-2xl">
-            {/* Table Header */}
             <div className="p-6 md:p-8 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
               <h3 className="text-lg font-black uppercase tracking-widest italic text-[#D4AF37]">{t.recent}</h3>
               <button onClick={() => setActiveTab('appointments')} className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest border border-[#D4AF37]/20 px-6 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
@@ -173,7 +179,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {loading ? (
-                    <tr><td colSpan="4" className="p-10 text-center text-gray-600 animate-pulse uppercase tracking-widest text-xs">Loading Data...</td></tr>
+                    <tr><td colSpan="4" className="p-10 text-center text-gray-600 animate-pulse uppercase tracking-widest text-xs">{t.loading}</td></tr>
                   ) : recentAppointments.map((appt) => (
                     <tr key={appt._id} className="hover:bg-white/[0.01] transition-all">
                       <td className="p-6">
@@ -185,26 +191,28 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
                           <span className="text-[#D4AF37] text-xs font-bold uppercase">
                             {appt.service || "General Treatment"}
                           </span>
-                          <div className="flex items-center gap-3 text-[10px] text-gray-500 uppercase">
+                          <div className="flex items-center gap-3 text-[10px] text-gray-500 uppercase font-medium">
                             <span className="flex items-center gap-1">
                               <Calendar size={10} /> 
-                              {appt.appointmentDate || appt.date || 'No Date'}
+                              {appt.appointmentDate || appt.date || t.noDate}
                             </span>
                             <span className="flex items-center gap-1">
                               <Clock size={10} /> 
-                              {appt.timeSlot || appt.time || 'No Time'}
+                              {appt.timeSlot || appt.time || t.noTime}
                             </span>
                           </div>
                         </div>
                       </td>
                       <td className="p-6">
                         <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase ${appt.status === 'Confirmed' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
-                          {appt.status || 'Pending'}
+                          {appt.status || (lang === 'bn' ? 'পেন্ডিং' : 'Pending')}
                         </span>
                       </td>
                       <td className="p-6">
                         <div className="flex justify-center gap-2">
-                          <button onClick={() => handleDelete(appt._id)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
+                          <button onClick={() => handleDelete(appt._id)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       </td>
                     </tr>
