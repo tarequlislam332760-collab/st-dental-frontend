@@ -1,27 +1,22 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next'; // i18next যুক্ত করা হয়েছে
 import SafeIcon from '../components/SafeIcon';
 
-// সেকশন ইম্পোর্ট
+// আগের ইম্পোর্টগুলো
 import Services from '../sections/Services';
 import DentalCare from '../sections/DentalCare';
 import Testimonials from '../sections/Testimonials';
 import Contact from '../sections/Contact';
 
-// কম্পোনেন্ট ও পেজ ইম্পোর্ট
+// নতুন ফিচারগুলোর ইম্পোর্ট
 import TransformSlider from '../components/TransformSlider';
 import Appointment from '../pages/Appointment';
 import WhatsAppWidget from '../components/WhatsAppWidget';
 import Blog from '../pages/Blog'; // ব্লগ পেজটি ইম্পোর্ট করা হয়েছে
 
-const Home = () => {
-  const { i18n } = useTranslation(); // গ্লোবাল ল্যাঙ্গুয়েজ স্টেট ধরার জন্য
+const Home = ({ lang }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  // i18n থেকে বর্তমান ভাষা (bn অথবা en) নেওয়া হচ্ছে
-  const activeLang = i18n.language?.split('-')[0] || 'en';
 
   const heroData = {
     bn: [
@@ -58,7 +53,7 @@ const Home = () => {
     ]
   };
 
-  const current = heroData[activeLang] ? heroData[activeLang][currentSlide] : heroData['en'][currentSlide];
+  const current = heroData[lang] ? heroData[lang][currentSlide] : heroData['en'][currentSlide];
 
   return (
     <div className="overflow-x-hidden">
@@ -66,8 +61,9 @@ const Home = () => {
       <section className="pt-32 lg:pt-0 lg:min-h-screen flex items-center bg-gradient-to-br from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-16 items-center w-full">
           
+          {/* Text Content */}
           <motion.div 
-            key={currentSlide + activeLang} // ল্যাঙ্গুয়েজ অনুযায়ী অ্যানিমেশন ট্রিগার করবে
+            key={currentSlide + lang} 
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ duration: 0.6 }}
@@ -83,18 +79,19 @@ const Home = () => {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to={current.link} className="bg-[#1a1a1a] text-[#D4AF37] px-10 py-5 rounded-full font-bold shadow-2xl hover:bg-[#D4AF37] hover:text-black transition-all transform hover:-translate-y-1">
-                {activeLang === 'bn' ? 'বিস্তারিত দেখুন' : 'View Details'}
+                {lang === 'bn' ? 'বিস্তারিত দেখুন' : 'View Details'}
               </Link>
               <button 
                 onClick={() => setCurrentSlide(currentSlide === 0 ? 1 : 0)} 
                 className="bg-white border-2 border-gray-100 px-6 py-5 rounded-full font-bold flex items-center gap-3 hover:border-[#D4AF37] transition-all"
               >
-                {activeLang === 'bn' ? 'অন্যান্য সেবা' : 'Other Services'} 
+                {lang === 'bn' ? 'অন্যান্য সেবা' : 'Other Services'} 
                 <SafeIcon name="ArrowRight" size={18} />
               </button>
             </div>
           </motion.div>
 
+          {/* Image Content */}
           <div className="relative">
             <motion.div 
               key={currentSlide} 
@@ -102,24 +99,45 @@ const Home = () => {
               animate={{ scale: 1, opacity: 1 }} 
               className="rounded-[60px] md:rounded-[100px] overflow-hidden shadow-2xl aspect-square border-[12px] border-white z-10 relative"
             >
-              <img src={current.img} className="w-full h-full object-cover" alt="Clinic" />
+              <img src={current.img} className="w-full h-full object-cover" alt="Clinic Care" />
             </motion.div>
+            
+            <div className="absolute -bottom-6 -left-6 md:-bottom-10 md:-left-10 bg-white p-6 md:p-8 rounded-[30px] shadow-2xl z-20 border-b-8 border-[#D4AF37]">
+              <div className="flex items-center gap-4">
+                <SafeIcon name="Stethoscope" size={28} className="text-[#D4AF37]" />
+                <div>
+                  <p className="text-2xl font-black leading-none text-[#1a1a1a]">24/7</p>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase">Emergency Support</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* কন্টেন্ট সেকশনসমূহ */}
-      <Services lang={activeLang} />
-      <TransformSlider lang={activeLang} />
-      <DentalCare lang={activeLang} />
-      <Appointment lang={activeLang} />
-      <Testimonials lang={activeLang} />
-      
-      {/* ব্লগ সেকশন এখানে যোগ করা হয়েছে */}
-      <Blog lang={activeLang} />
+      {/* ১. সেবা সমূহ */}
+      <Services lang={lang} />
 
-      <Contact lang={activeLang} />
-      <WhatsAppWidget lang={activeLang} />
+      {/* ২. ডেন্টাল এবং ফেসিয়াল ট্রান্সফরমেশন স্লাইডার */}
+      <TransformSlider lang={lang} />
+
+      {/* ৩. ডেন্টাল কেয়ার ডিটেইলস */}
+      <DentalCare lang={lang} />
+
+      {/* ৪. নতুন এবং উন্নত অ্যাপয়েন্টমেন্ট ফর্ম */}
+      <Appointment lang={lang} />
+
+      {/* ৫. ইউজার রিভিউ */}
+      <Testimonials lang={lang} />
+
+      {/* ব্লগ সেকশন (Testimonials এবং Contact এর মাঝে যুক্ত করা হয়েছে) */}
+      <Blog lang={lang} />
+
+      {/* ৬. কন্টাক্ট সেকশন */}
+      <Contact lang={lang} />
+
+      {/* ৭. ফ্লোটিং হোয়াটসঅ্যাপ বাটন */}
+      <WhatsAppWidget lang={lang} />
     </div>
   );
 };
