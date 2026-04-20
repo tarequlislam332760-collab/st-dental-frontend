@@ -7,7 +7,7 @@ import axios from 'axios';
 import Dashboard from './Dashboard';
 import ManageAppointments from './ManageAppointments';
 import ManageReviews from './ManageReviews';
-import ManageBlogs from './ManageBlogs'; 
+import ManageBlogs from './ManageBlogs'; // এখানে ইম্পোর্ট করা হলো
 
 const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   const [lang, setLang] = useState(initialLang);
@@ -158,7 +158,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
             {activeTab === 'blogs' && (
               <ManageBlogs 
                 lang={lang} 
-                t={t.blogActions} // ব্লগের জন্য অ্যাকশন টেক্সট পাস করা হচ্ছে
+                t={t.blogActions} 
               />
             )} 
           </motion.div>
