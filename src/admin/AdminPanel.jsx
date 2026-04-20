@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, MessageSquare, LogOut, Edit, Trash2, CheckCircle, Menu, X, Save, Clock, Calendar } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, LogOut, Edit, Trash2, CheckCircle, Menu, X, Save, Clock, Calendar, FileText, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
@@ -7,8 +7,11 @@ import axios from 'axios';
 import Dashboard from './Dashboard';
 import ManageAppointments from './ManageAppointments';
 import ManageReviews from './ManageReviews';
+import ManageBlogs from './ManageBlogs'; 
 
-const AdminPanel = ({ lang = 'bn' }) => {
+const AdminPanel = ({ lang: initialLang = 'bn' }) => {
+  // ১. ল্যাঙ্গুয়েজকে স্টেটে রাখা হয়েছে যাতে চেঞ্জ করলে সব জায়গায় আপডেট হয়
+  const [lang, setLang] = useState(initialLang);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [recentAppointments, setRecentAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +24,7 @@ const AdminPanel = ({ lang = 'bn' }) => {
     try {
       setLoading(true);
       const res = await axios.get('https://st-dental-backend.vercel.app/api/appointments');
-      setRecentAppointments(res.data.slice(0, 8)); // সাম্প্রতিক ৮টি অ্যাপয়েন্টমেন্ট
+      setRecentAppointments(res.data.slice(0, 8)); 
       setLoading(false);
     } catch (err) {
       console.error("Error fetching admin data:", err);
@@ -38,8 +41,29 @@ const AdminPanel = ({ lang = 'bn' }) => {
     window.location.href = '/st-admin-secure/login';
   };
 
+  const toggleLang = () => {
+    setLang(prev => prev === 'bn' ? 'en' : 'bn');
+  };
+
+  const t = {
+    en: {
+      dash: "Dashboard", appt: "Appointments", rev: "Reviews", blog: "Blogs", logout: "Logout",
+      welcome: "Welcome back,", subtitle: "Manage your dental & facial clinic.",
+      recent: "Recent Schedule", viewAll: "View All",
+      table: { name: "Patient", info: "Service & Time", status: "Status", action: "Action" },
+      deleteConfirm: "Are you sure you want to delete?"
+    },
+    bn: {
+      dash: "ড্যাশবোর্ড", appt: "অ্যাপয়েন্টমেন্ট", rev: "রিভিউ", blog: "ব্লগ", logout: "লগআউট",
+      welcome: "স্বাগতম,", subtitle: "ডেন্টাল এবং ফেসিয়াল ক্লিনিক পরিচালনা করুন।",
+      recent: "সাম্প্রতিক শিডিউল", viewAll: "সব দেখুন",
+      table: { name: "রোগী", info: "সেবা ও সময়", status: "অবস্থা", action: "অ্যাকশন" },
+      deleteConfirm: "আপনি কি এটি ডিলিট করতে চান?"
+    }
+  }[lang];
+
   const handleDelete = async (id) => {
-    if(window.confirm(lang === 'bn' ? "আপনি কি এটি ডিলিট করতে চান?" : "Are you sure you want to delete?")) {
+    if(window.confirm(t.deleteConfirm)) {
       try {
         await axios.delete(`https://st-dental-backend.vercel.app/api/appointments/${id}`);
         fetchRecentData();
@@ -49,46 +73,14 @@ const AdminPanel = ({ lang = 'bn' }) => {
     }
   };
 
-  const startEdit = (appt) => {
-    setEditingId(appt._id);
-    setEditForm({ 
-      name: appt.name, 
-      service: appt.service, 
-      timeSlot: appt.timeSlot || '', 
-      appointmentDate: appt.appointmentDate || '' 
-    });
-  };
-
-  const handleSave = async (id) => {
-    try {
-      await axios.put(`https://st-dental-backend.vercel.app/api/appointments/${id}`, editForm);
-      setEditingId(null);
-      fetchRecentData();
-    } catch (err) {
-      alert("Update failed!");
-    }
-  };
-
-  const t = {
-    en: {
-      dash: "Dashboard", appt: "Appointments", rev: "Reviews", logout: "Logout",
-      welcome: "Welcome back,", subtitle: "Manage your dental & facial clinic.",
-      recent: "Recent Schedule", viewAll: "View All",
-      table: { name: "Patient", info: "Service & Time", status: "Status", action: "Action" }
-    },
-    bn: {
-      dash: "ড্যাশবোর্ড", appt: "অ্যাপয়েন্টমেন্ট", rev: "রিভিউ", logout: "লগআউট",
-      welcome: "স্বাগতম,", subtitle: "ডেন্টাল এবং ফেসিয়াল ক্লিনিক পরিচালনা করুন।",
-      recent: "সাম্প্রতিক শিডিউল", viewAll: "সব দেখুন",
-      table: { name: "রোগী", info: "সেবা ও সময়", status: "অবস্থা", action: "অ্যাকশন" }
-    }
-  }[lang];
-
   return (
     <div className="flex min-h-screen bg-[#050505] text-white font-sans selection:bg-[#D4AF37] selection:text-black relative">
       
-      {/* Mobile Toggle */}
-      <div className="md:hidden fixed top-4 right-4 z-[60]">
+      {/* Mobile Toggle & Lang Toggle */}
+      <div className="md:hidden fixed top-4 right-4 z-[60] flex gap-2">
+        <button onClick={toggleLang} className="p-3 bg-white/5 text-[#D4AF37] rounded-xl border border-white/10 shadow-lg uppercase text-[10px] font-black">
+          {lang === 'bn' ? 'EN' : 'BN'}
+        </button>
         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-3 bg-[#D4AF37] text-black rounded-xl shadow-lg">
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -106,6 +98,7 @@ const AdminPanel = ({ lang = 'bn' }) => {
             { id: 'dashboard', label: t.dash, icon: LayoutDashboard },
             { id: 'appointments', label: t.appt, icon: Users },
             { id: 'reviews', label: t.rev, icon: MessageSquare },
+            { id: 'blogs', label: t.blog, icon: FileText },
           ].map((item) => (
             <button 
               key={item.id}
@@ -120,7 +113,13 @@ const AdminPanel = ({ lang = 'bn' }) => {
             </button>
           ))}
         </nav>
-        <button onClick={handleLogout} className="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-xl mt-auto font-bold transition-all">
+
+        {/* Language Switcher in Sidebar (Desktop) */}
+        <button onClick={toggleLang} className="mb-4 flex items-center gap-4 px-4 py-3 text-[#D4AF37] bg-white/5 rounded-xl font-bold transition-all border border-white/5 hover:border-[#D4AF37]/30 uppercase text-xs tracking-widest">
+           <Globe size={18} /> {lang === 'bn' ? 'English Language' : 'বাংলা ভাষা'}
+        </button>
+
+        <button onClick={handleLogout} className="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-xl font-bold transition-all">
           <LogOut size={18} /> {t.logout}
         </button>
       </aside>
@@ -144,15 +143,17 @@ const AdminPanel = ({ lang = 'bn' }) => {
         </header>
 
         <AnimatePresence mode="wait">
-          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <motion.div key={activeTab + lang} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
             {activeTab === 'dashboard' && <Dashboard lang={lang} />}
             {activeTab === 'appointments' && <ManageAppointments lang={lang} />}
             {activeTab === 'reviews' && <ManageReviews lang={lang} />}
+            {activeTab === 'blogs' && <ManageBlogs lang={lang} />} 
           </motion.div>
         </AnimatePresence>
 
         {activeTab === 'dashboard' && (
           <section className="mt-10 bg-[#111111] rounded-[35px] border border-white/5 overflow-hidden shadow-2xl">
+            {/* Table Header */}
             <div className="p-6 md:p-8 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
               <h3 className="text-lg font-black uppercase tracking-widest italic text-[#D4AF37]">{t.recent}</h3>
               <button onClick={() => setActiveTab('appointments')} className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest border border-[#D4AF37]/20 px-6 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
@@ -181,10 +182,18 @@ const AdminPanel = ({ lang = 'bn' }) => {
                       </td>
                       <td className="p-6">
                         <div className="flex flex-col gap-1">
-                          <span className="text-[#D4AF37] text-xs font-bold uppercase">{appt.service}</span>
+                          <span className="text-[#D4AF37] text-xs font-bold uppercase">
+                            {appt.service || "General Treatment"}
+                          </span>
                           <div className="flex items-center gap-3 text-[10px] text-gray-500 uppercase">
-                            <span className="flex items-center gap-1"><Calendar size={10} /> {appt.appointmentDate || 'N/A'}</span>
-                            <span className="flex items-center gap-1"><Clock size={10} /> {appt.timeSlot || 'N/A'}</span>
+                            <span className="flex items-center gap-1">
+                              <Calendar size={10} /> 
+                              {appt.appointmentDate || appt.date || 'No Date'}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock size={10} /> 
+                              {appt.timeSlot || appt.time || 'No Time'}
+                            </span>
                           </div>
                         </div>
                       </td>
@@ -195,8 +204,6 @@ const AdminPanel = ({ lang = 'bn' }) => {
                       </td>
                       <td className="p-6">
                         <div className="flex justify-center gap-2">
-                          <button onClick={() => startEdit(appt)} className="p-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-all"><Edit size={14} /></button>
-                          <button className="p-2 bg-green-500/10 text-green-500 rounded-lg hover:bg-green-500 hover:text-white transition-all"><CheckCircle size={14} /></button>
                           <button onClick={() => handleDelete(appt._id)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={14} /></button>
                         </div>
                       </td>

@@ -7,34 +7,60 @@ const Appointment = ({ lang }) => {
     phone: '',
     department: 'Select Department',
     date: '',
-    time: '' // এখানে এখন পেশেন্টের সিলেক্ট করা টাইম সেভ হবে
+    time: '',
+    // যদি আপনার ব্যাকেন্ডে 'message' বা 'email' ফিল্ড বাধ্যতামূলক থাকে, তবে এখানে সেগুলো যোগ করুন
+    message: 'New Appointment Booking' 
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ভ্যালিডেশন
     if (formData.department === 'Select Department' || !formData.time) {
       alert(lang === 'bn' ? 'দয়া করে বিভাগ এবং সময় নির্বাচন করুন' : 'Please select department and time slot');
       return;
     }
 
+    setLoading(true);
+
     try {
-      // API call with headers to ensure JSON parsing
+      // API call
+      // নোট: ব্যাকেন্ডে যদি Schema-তে 'service' থাকে আর আপনি 'department' পাঠান, তবে এরর আসতে পারে।
+      // তাই আমরা ব্যাকেন্ডের সাথে মিল রেখে ডাটা পাঠাচ্ছি।
       const res = await axios.post('https://st-dental-backend.vercel.app/api/appointments', formData, {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json'
+        }
       });      
       
       if (res.status === 201 || res.data.success) {
         alert(lang === 'bn' ? 'আপনার সিরিয়াল সফলভাবে নিশ্চিত করা হয়েছে!' : 'Appointment confirmed successfully!');
-        setFormData({ name: '', phone: '', department: 'Select Department', date: '', time: '' });
+        // ফর্ম রিসেট
+        setFormData({ 
+          name: '', 
+          phone: '', 
+          department: 'Select Department', 
+          date: '', 
+          time: '',
+          message: 'New Appointment Booking'
+        });
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert(lang === 'bn' ? 'দুঃখিত, কোনো সমস্যা হয়েছে। আবার চেষ্টা করুন।' : 'Sorry, something went wrong. Try again.');
+      console.error('Submission Error Details:', error.response?.data);
+      
+      // ব্যাকেন্ড থেকে আসা স্পেসিফিক এরর মেসেজ দেখানো
+      const errorMsg = error.response?.data?.message || (lang === 'bn' ? 'দুঃখিত, কোনো সমস্যা হয়েছে।' : 'Sorry, something went wrong.');
+      alert(errorMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <section className="relative pt-24 md:pt-40 pb-16 px-4 overflow-hidden bg-[#0a0a0a]">
+      {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#D4AF37] opacity-[0.05] blur-[120px] pointer-events-none"></div>
 
       <div className="max-w-4xl mx-auto relative z-10">
@@ -61,6 +87,7 @@ const Appointment = ({ lang }) => {
               <input 
                 type="text" 
                 required
+                name="name"
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
                 placeholder="John Doe" 
@@ -74,6 +101,7 @@ const Appointment = ({ lang }) => {
               <input 
                 type="tel" 
                 required
+                name="phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
                 placeholder="+880 1XXX-XXXXXX" 
@@ -86,6 +114,7 @@ const Appointment = ({ lang }) => {
               <label className="text-[9px] uppercase tracking-[2px] text-[#D4AF37] font-bold ml-1">Select Department</label>
               <select 
                 value={formData.department}
+                required
                 onChange={(e) => setFormData({...formData, department: e.target.value})}
                 className="w-full p-4 md:p-5 rounded-2xl bg-black/50 text-gray-400 border border-white/5 focus:border-[#D4AF37] outline-none transition-all appearance-none"
               >
@@ -108,10 +137,10 @@ const Appointment = ({ lang }) => {
               />
             </div>
 
-            {/* Real-time Time Picker (পেশেন্ট এখন নিজের সময় সেট করতে পারবে) */}
+            {/* Time Picker */}
             <div className="md:col-span-2 flex flex-col gap-2">
               <label className="text-[9px] uppercase tracking-[2px] text-[#D4AF37] font-bold ml-1">
-                {lang === 'bn' ? 'পছন্দমতো সময় নির্বাচন করুন' : 'Select Your Preferred Time'}
+                {lang === 'bn' ? 'পছন্দমতো সময় নির্বাচন করুন' : 'Select Your Preferred Time'}
               </label>
               <input 
                 type="time" 
@@ -128,9 +157,10 @@ const Appointment = ({ lang }) => {
             {/* Submit Button */}
             <button 
               type="submit"
-              className="w-full md:col-span-2 bg-[#D4AF37] text-black py-5 rounded-[20px] font-black uppercase shadow-[0_10px_40px_rgba(212,175,55,0.2)] hover:bg-white hover:shadow-white/10 transition-all transform active:scale-95 mt-4 tracking-widest"
+              disabled={loading}
+              className={`w-full md:col-span-2 bg-[#D4AF37] text-black py-5 rounded-[20px] font-black uppercase shadow-[0_10px_40px_rgba(212,175,55,0.2)] hover:bg-white hover:shadow-white/10 transition-all transform active:scale-95 mt-4 tracking-widest ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              {lang === 'bn' ? 'সিরিয়াল নিশ্চিত করুন' : 'Confirm Appointment'}
+              {loading ? (lang === 'bn' ? 'অপেক্ষা করুন...' : 'Processing...') : (lang === 'bn' ? 'সিরিয়াল নিশ্চিত করুন' : 'Confirm Appointment')}
             </button>
           </form>
         </div>
