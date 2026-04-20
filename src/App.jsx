@@ -15,7 +15,11 @@ import DentalCare from './sections/DentalCare';
 import SkinCare from './sections/SkinCare';
 import Testimonials from './sections/Testimonials';
 
-// --- অ্যাডমিন প্যানেল ইম্পোর্ট (নতুন) ---
+// --- নতুন যোগ করা ফাইল ইম্পোর্ট ---
+import TransformSidebar from './sections/TransformSidebar';
+import BeforeAfterSidebar from './sections/BeforeAfterSidebar';
+
+// --- অ্যাডমিন প্যানেল ইম্পোর্ট ---
 import AdminPanel from './admin/AdminPanel';
 import Login from './admin/Login';
 import ProtectedRoute from './admin/ProtectedRoute';
@@ -31,6 +35,7 @@ const translations = {
     home: "হোম", services: "সেবা", about: "আমাদের সম্পর্কে", contact: "যোগাযোগ",
     dental: "ডেন্টাল কেয়ার", skin: "স্কিন কেয়ার", treatment: "ট্রিটমেন্ট",
     testimonials: "রিভিউ", btn: "সিরিয়াল নিন", other: "অন্যান্য সেবা", call: "কল করুন", whatsapp: "হোয়াটসঅ্যাপ",
+    blog: "ব্লগ", transform: "ট্রান্সফর্ম", beforeAfter: "বিফোর-আফটার",
     hero: [
       { title: "সেরা ডেন্টাল চিকিৎসা", sub: "Premium Dental Care", desc: "আধুনিক প্রযুক্তিতে আমরা নিশ্চিত করি আপনার সুন্দর হাসি।" },
       { title: "উজ্জ্বল ত্বকের পূর্ণ নিশ্চয়তা", sub: "Expert Facial & Skin", desc: "আপনার ত্বকের যত্নে আমাদের বিশেষজ্ঞ ডাক্তাররা রয়েছেন।" }
@@ -40,19 +45,20 @@ const translations = {
     home: "Home", services: "Services", about: "About", contact: "Contact",
     dental: "Dental Care", skin: "Skin Care", treatment: "Treatment",
     testimonials: "Testimonials", btn: "Get Appointment", other: "Other Services", call: "Call Now", whatsapp: "WhatsApp",
+    blog: "Blog", transform: "Transform", beforeAfter: "Before-After",
     hero: [
       { title: "Best Dental Care", sub: "Premium Dental Care", desc: "We ensure your beautiful smile with modern technology." },
       { title: "Guaranteed Glowing Skin", sub: "Expert Facial & Skin", desc: "Our expert doctors are here to take care of your skin." }
     ]
   },
-  ar: { home: "الصفحة الرئيسية", services: "خدمات", about: "حول", contact: "اتصال", dental: "عناية بالأسنان", skin: "العناية بالبشرة", treatment: "علاج", testimonials: "شهادات", btn: "حجز موعد", call: "اتصل الآن", whatsapp: "واتساب" },
-  hi: { home: "होम", services: "सेवाएं", about: "हमारे बारे में", contact: "संपর্ক", dental: "দন্ত চিকিৎসা", skin: "ত্বচা की देखभाल", treatment: "उपचार", testimonials: "प्रमाणपत्र", btn: "अपॉइंटमेंट लें", call: "अभी কল करें", whatsapp: "व्हाट्सएप" },
-  es: { home: "Inicio", services: "Servicios", about: "Nosotros", contact: "Contacto", dental: "Cuidado Dental", skin: "Cuidado Piel", treatment: "Tratamiento", testimonials: "Testimonios", btn: "Reservar", call: "Llamar", whatsapp: "WhatsApp" },
-  fr: { home: "Accueil", services: "Services", about: "À propos", contact: "Contact", dental: "Soin Dentaire", skin: "Soin Peau", treatment: "Traitement", testimonials: "Témoignages", btn: "Réserver", call: "Appeler", whatsapp: "WhatsApp" },
-  de: { home: "Startseite", services: "Dienste", about: "Über uns", contact: "Kontakt", dental: "Zahnpflege", skin: "Hautpflege", treatment: "Behandlung", testimonials: "Referenzen", btn: "Buchen", call: "Anrufen", whatsapp: "WhatsApp" },
-  zh: { home: "首页", services: "服务", about: "关于我们", contact: "联系我们", dental: "牙科护理", skin: "皮肤护理", treatment: "治疗", testimonials: "客户评价", btn: "现在预订", call: "现在打电话", whatsapp: "微信/WhatsApp" },
-  ru: { home: "Главная", services: "Услуги", about: "О нас", contact: "Контакт", dental: "Уход за зубами", skin: "Уход за кожей", treatment: "Лечение", testimonials: "Отзывы", btn: "Забронировать", call: "Позвонить", whatsapp: "WhatsApp" },
-  tr: { home: "Anasayfa", services: "Hizmetler", about: "Hakkımızda", contact: "İletişim", dental: "Diş Bakımı", skin: "Cilt Bakımı", treatment: "Tedavi", testimonials: "Yorumlar", btn: "Randevu Al", call: "Ara", whatsapp: "WhatsApp" }
+  ar: { home: "الصفحة الرئيسية", services: "خدمات", about: "حول", contact: "اتصال", dental: "عناية بالأسنان", skin: "العناية بالبشرة", treatment: "علاج", testimonials: "شهادات", btn: "حجز موعد", call: "اتصل الآن", whatsapp: "واتساب", blog: "مدونة", transform: "تحويل", beforeAfter: "قبل وبعد" },
+  hi: { home: "होम", services: "सेवाएं", about: "हमारे बारे में", contact: "संपর্ক", dental: "দন্ত চিকিৎসা", skin: "ত্বचा की देखभाल", treatment: "उपचार", testimonials: "प्रमाणपत्र", btn: "अपॉइंटमेंट लें", call: "अभी কল करें", whatsapp: "व्हाट्सएप", blog: "ब्लॉग", transform: "ट्रांसफॉर्म", beforeAfter: "पहले और बाद में" },
+  es: { home: "Inicio", services: "Servicios", about: "Nosotros", contact: "Contacto", dental: "Cuidado Dental", skin: "Cuidado Piel", treatment: "Tratamiento", testimonials: "Testimonios", btn: "Reservar", call: "Llamar", whatsapp: "WhatsApp", blog: "Blog", transform: "Transformar", beforeAfter: "Antes y Después" },
+  fr: { home: "Accueil", services: "Services", about: "À propos", contact: "Contact", dental: "Soin Dentaire", skin: "Soin Peau", treatment: "Traitement", testimonials: "Témoignages", btn: "Réserver", call: "Appeler", whatsapp: "WhatsApp", blog: "Blog", transform: "Transformer", beforeAfter: "Avant/Après" },
+  de: { home: "Startseite", services: "Dienste", about: "Über uns", contact: "Kontakt", dental: "Zahnpflege", skin: "Hautpflege", treatment: "Behandlung", testimonials: "Referenzen", btn: "Buchen", call: "Anrufen", whatsapp: "WhatsApp", blog: "Blog", transform: "Verwandeln", beforeAfter: "Vorher/Nachher" },
+  zh: { home: "首页", services: "服务", about: "关于我们", contact: "联系我们", dental: "牙科护理", skin: "皮肤护理", treatment: "治疗", testimonials: "客户评价", btn: "现在预订", call: "现在打电话", whatsapp: "微信/WhatsApp", blog: "博客", transform: "转型", beforeAfter: "前后对比" },
+  ru: { home: "Главная", services: "Услуги", about: "О нас", contact: "Контакт", dental: "Уход за зубами", skin: "Уход за кожей", treatment: "Лечение", testimonials: "Отзывы", btn: "Забронировать", call: "Позвонить", whatsapp: "WhatsApp", blog: "Блог", transform: "Трансформация", beforeAfter: "До и после" },
+  tr: { home: "Anasayfa", services: "Hizmetler", about: "Hakkımızda", contact: "İletişim", dental: "Diş Bakımı", skin: "Cilt Bakımı", treatment: "Tedavi", testimonials: "Yorumlar", btn: "Randevu Al", call: "Ara", whatsapp: "WhatsApp", blog: "Blog", transform: "Dönüşüm", beforeAfter: "Önce ve Sonra" }
 };
 
 const languages = [
@@ -108,6 +114,7 @@ const AppContent = () => {
               {[
                 { name: t.home, path: "/" },
                 { name: t.services, path: "/services" },
+                { name: t.blog, path: "/blog" },
                 { name: t.about, path: "/about" },
                 { name: t.contact, path: "/contact" },
                 { name: t.testimonials, path: "/testimonials" }
@@ -130,6 +137,8 @@ const AppContent = () => {
                   <div className="absolute top-full left-0 w-48 bg-white shadow-2xl border-t-4 border-[#D4AF37] py-3 rounded-b-xl animate-in fade-in slide-in-from-top-2 z-[110]">
                     <Link to="/dental-care" onClick={() => setIsTreatmentOpen(false)} className="block px-6 py-2 hover:bg-gray-50 hover:text-[#D4AF37] text-[11px] font-bold">{t.dental}</Link>
                     <Link to="/skin-care" onClick={() => setIsTreatmentOpen(false)} className="block px-6 py-2 hover:bg-gray-50 hover:text-[#D4AF37] text-[11px] font-bold">{t.skin}</Link>
+                    <Link to="/transform" onClick={() => setIsTreatmentOpen(false)} className="block px-6 py-2 hover:bg-gray-50 hover:text-[#D4AF37] text-[11px] font-bold">{t.transform}</Link>
+                    <Link to="/before-after" onClick={() => setIsTreatmentOpen(false)} className="block px-6 py-2 hover:bg-gray-50 hover:text-[#D4AF37] text-[11px] font-bold">{t.beforeAfter}</Link>
                   </div>
                 )}
               </div>
@@ -169,6 +178,7 @@ const AppContent = () => {
               <nav className="flex flex-col gap-6 font-bold uppercase text-sm tracking-widest text-gray-800">
                 <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>{t.home}</Link>
                 <Link to="/services" onClick={() => setIsMobileMenuOpen(false)}>{t.services}</Link>
+                <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)}>{t.blog}</Link>
                 <Link to="/about" onClick={() => setIsMobileMenuOpen(false)}>{t.about}</Link>
                 <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>{t.contact}</Link>
                 <Link to="/testimonials" onClick={() => setIsMobileMenuOpen(false)}>{t.testimonials}</Link>
@@ -181,6 +191,8 @@ const AppContent = () => {
                   <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4 pl-4 border-l-2 border-[#D4AF37]/30">
                     <Link to="/dental-care" className="text-[#D4AF37] text-xs" onClick={() => setIsMobileMenuOpen(false)}>{t.dental}</Link>
                     <Link to="/skin-care" className="text-[#D4AF37] text-xs" onClick={() => setIsMobileMenuOpen(false)}>{t.skin}</Link>
+                    <Link to="/transform" className="text-[#D4AF37] text-xs" onClick={() => setIsMobileMenuOpen(false)}>{t.transform}</Link>
+                    <Link to="/before-after" className="text-[#D4AF37] text-xs" onClick={() => setIsMobileMenuOpen(false)}>{t.beforeAfter}</Link>
                   </motion.div>
                 )}
                 <Link to="/appointment" onClick={() => setIsMobileMenuOpen(false)} className="mt-4 bg-[#D4AF37] text-white py-3 px-6 rounded-lg text-center text-xs">{t.btn}</Link>
@@ -190,17 +202,18 @@ const AppContent = () => {
         )}
       </AnimatePresence>
 
-      {/* WhatsAppWidget Routes এর বাইরে থাকতে হবে */}
       {!isAdminPath && <WhatsAppWidget lang={lang} />}
 
       <Routes>
-        <Route path="/blog" element={<Blog />} />
         <Route path="/" element={<Home lang={lang} />} /> 
+        <Route path="/blog" element={<Blog lang={lang} />} />
         <Route path="/services" element={<Services lang={lang} />} />
         <Route path="/about" element={<About lang={lang} />} />
         <Route path="/contact" element={<Contact lang={lang} />} />
         <Route path="/dental-care" element={<DentalCare lang={lang} />} />
         <Route path="/skin-care" element={<SkinCare lang={lang} />} />
+        <Route path="/transform" element={<TransformSidebar lang={lang} />} />
+        <Route path="/before-after" element={<BeforeAfterSidebar lang={lang} />} />
         <Route path="/appointment" element={<Appointment lang={lang} />} />
         <Route path="/testimonials" element={<Testimonials lang={lang} />} />
         
@@ -234,8 +247,8 @@ const AppContent = () => {
               <ul className="space-y-4 text-gray-400 text-sm font-medium">
                 <li><Link to="/dental-care" className="hover:text-[#D4AF37] transition-colors">{t.dental}</Link></li>
                 <li><Link to="/skin-care" className="hover:text-[#D4AF37] transition-colors">{t.skin}</Link></li>
-                <li><Link to="/about" className="hover:text-[#D4AF37] transition-colors">{t.about}</Link></li>
-                <li><Link to="/testimonials" className="hover:text-[#D4AF37] transition-colors">{t.testimonials}</Link></li>
+                <li><Link to="/transform" className="hover:text-[#D4AF37] transition-colors">{t.transform}</Link></li>
+                <li><Link to="/before-after" className="hover:text-[#D4AF37] transition-colors">{t.beforeAfter}</Link></li>
               </ul>
             </div>
 

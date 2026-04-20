@@ -7,19 +7,23 @@ const Appointment = ({ lang }) => {
     phone: '',
     department: 'Select Department',
     date: '',
-    time: ''
+    time: '' // এখানে এখন পেশেন্টের সিলেক্ট করা টাইম সেভ হবে
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.department === 'Select Department' || !formData.time) {
-      alert(lang === 'bn' ? 'দয়া করে বিভাগ এবং সময় নির্বাচন করুন' : 'Please select department and time slot');
+      alert(lang === 'bn' ? 'দয়া করে বিভাগ এবং সময় নির্বাচন করুন' : 'Please select department and time slot');
       return;
     }
 
     try {
-      const res = await axios.post('https://st-dental-backend.vercel.app/api/appointments', formData);      
-      if (res.data.success) {
+      // API call with headers to ensure JSON parsing
+      const res = await axios.post('https://st-dental-backend.vercel.app/api/appointments', formData, {
+        headers: { 'Content-Type': 'application/json' }
+      });      
+      
+      if (res.status === 201 || res.data.success) {
         alert(lang === 'bn' ? 'আপনার সিরিয়াল সফলভাবে নিশ্চিত করা হয়েছে!' : 'Appointment confirmed successfully!');
         setFormData({ name: '', phone: '', department: 'Select Department', date: '', time: '' });
       }
@@ -31,7 +35,6 @@ const Appointment = ({ lang }) => {
 
   return (
     <section className="relative pt-24 md:pt-40 pb-16 px-4 overflow-hidden bg-[#0a0a0a]">
-      {/* Background Decorative Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#D4AF37] opacity-[0.05] blur-[120px] pointer-events-none"></div>
 
       <div className="max-w-4xl mx-auto relative z-10">
@@ -46,7 +49,7 @@ const Appointment = ({ lang }) => {
               )}
             </h2>
             <p className="text-[10px] md:text-xs text-gray-500 uppercase tracking-[4px] mt-3">
-              {lang === 'bn' ? 'ডেন্টাল এবং ফেসিয়াল এসথেটিক্স' : 'Advanced Dental & Facial Aesthetics'}
+              {lang === 'bn' ? 'ডেন্টাল এবং ফেসিয়াল এসথেটিক্স' : 'Advanced Dental & Facial Aesthetics'}
             </p>
           </div>
 
@@ -61,7 +64,7 @@ const Appointment = ({ lang }) => {
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
                 placeholder="John Doe" 
-                className="w-full p-4 md:p-5 rounded-2xl bg-black/50 text-white border border-white/5 focus:border-[#D4AF37] outline-none transition-all placeholder:text-gray-800" 
+                className="w-full p-4 md:p-5 rounded-2xl bg-black/50 text-white border border-white/5 focus:border-[#D4AF37] outline-none transition-all" 
               />
             </div>
 
@@ -74,7 +77,7 @@ const Appointment = ({ lang }) => {
                 value={formData.phone}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
                 placeholder="+880 1XXX-XXXXXX" 
-                className="w-full p-4 md:p-5 rounded-2xl bg-black/50 text-white border border-white/5 focus:border-[#D4AF37] outline-none transition-all placeholder:text-gray-800" 
+                className="w-full p-4 md:p-5 rounded-2xl bg-black/50 text-white border border-white/5 focus:border-[#D4AF37] outline-none transition-all" 
               />
             </div>
 
@@ -105,25 +108,21 @@ const Appointment = ({ lang }) => {
               />
             </div>
 
-            {/* Time Slot (Full Width on Mobile) */}
-            <div className="md:col-span-2 flex flex-col gap-3">
-              <label className="text-[9px] uppercase tracking-[2px] text-[#D4AF37] font-bold ml-1 text-center md:text-left">Available Time Slots</label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {['10:00 AM', '12:00 PM', '04:30 PM', '07:30 PM'].map((slot) => (
-                  <button
-                    key={slot}
-                    type="button"
-                    onClick={() => setFormData({...formData, time: slot})}
-                    className={`py-3 px-2 rounded-xl text-[11px] font-bold uppercase transition-all border ${
-                      formData.time === slot 
-                      ? 'bg-[#D4AF37] text-black border-[#D4AF37]' 
-                      : 'bg-black/30 text-gray-500 border-white/5 hover:border-[#D4AF37]/50'
-                    }`}
-                  >
-                    {slot}
-                  </button>
-                ))}
-              </div>
+            {/* Real-time Time Picker (পেশেন্ট এখন নিজের সময় সেট করতে পারবে) */}
+            <div className="md:col-span-2 flex flex-col gap-2">
+              <label className="text-[9px] uppercase tracking-[2px] text-[#D4AF37] font-bold ml-1">
+                {lang === 'bn' ? 'পছন্দমতো সময় নির্বাচন করুন' : 'Select Your Preferred Time'}
+              </label>
+              <input 
+                type="time" 
+                required
+                value={formData.time}
+                onChange={(e) => setFormData({...formData, time: e.target.value})}
+                className="w-full p-4 md:p-5 rounded-2xl bg-black/50 text-gray-400 border border-white/5 focus:border-[#D4AF37] outline-none transition-all cursor-pointer" 
+              />
+              <p className="text-[8px] text-gray-600 uppercase tracking-widest mt-1 ml-1">
+                * Please select a time during hospital hours (e.g., 10:00 AM - 08:00 PM)
+              </p>
             </div>
 
             {/* Submit Button */}
