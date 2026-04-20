@@ -7,9 +7,7 @@ const Appointment = ({ lang }) => {
     phone: '',
     department: 'Select Department',
     date: '',
-    time: '',
-    // যদি আপনার ব্যাকেন্ডে 'message' বা 'email' ফিল্ড বাধ্যতামূলক থাকে, তবে এখানে সেগুলো যোগ করুন
-    message: 'New Appointment Booking' 
+    time: ''
   });
 
   const [loading, setLoading] = useState(false);
@@ -26,16 +24,23 @@ const Appointment = ({ lang }) => {
     setLoading(true);
 
     try {
+      // ব্যাকএন্ডের কন্ট্রোলারের সাথে মিল রেখে ডেটা ম্যাপিং
+      const dataToSubmit = {
+        name: formData.name,
+        phone: formData.phone,
+        service: formData.department,        // backend expects 'service'
+        appointmentDate: formData.date,      // backend expects 'appointmentDate'
+        timeSlot: formData.time              // backend expects 'timeSlot'
+      };
+
       // API call
-      // নোট: ব্যাকেন্ডে যদি Schema-তে 'service' থাকে আর আপনি 'department' পাঠান, তবে এরর আসতে পারে।
-      // তাই আমরা ব্যাকেন্ডের সাথে মিল রেখে ডাটা পাঠাচ্ছি।
-      const res = await axios.post('https://st-dental-backend.vercel.app/api/appointments', formData, {
+      const res = await axios.post('https://st-dental-backend.vercel.app/api/appointments', dataToSubmit, {
         headers: { 
           'Content-Type': 'application/json'
         }
       });      
       
-      if (res.status === 201 || res.data.success) {
+      if (res.data.success) {
         alert(lang === 'bn' ? 'আপনার সিরিয়াল সফলভাবে নিশ্চিত করা হয়েছে!' : 'Appointment confirmed successfully!');
         // ফর্ম রিসেট
         setFormData({ 
@@ -43,14 +48,13 @@ const Appointment = ({ lang }) => {
           phone: '', 
           department: 'Select Department', 
           date: '', 
-          time: '',
-          message: 'New Appointment Booking'
+          time: ''
         });
       }
     } catch (error) {
       console.error('Submission Error Details:', error.response?.data);
       
-      // ব্যাকেন্ড থেকে আসা স্পেসিফিক এরর মেসেজ দেখানো
+      // ব্যাকএন্ড থেকে আসা এরর মেসেজ দেখানো
       const errorMsg = error.response?.data?.message || (lang === 'bn' ? 'দুঃখিত, কোনো সমস্যা হয়েছে।' : 'Sorry, something went wrong.');
       alert(errorMsg);
     } finally {
