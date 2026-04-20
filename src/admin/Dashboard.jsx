@@ -60,7 +60,7 @@ const Dashboard = ({ lang }) => {
 
   return (
     <div className="w-full space-y-8 md:space-y-12">
-      {/* Overview Header */}
+      {/* ১. ওভারভিউ সেকশন */}
       <div className="flex justify-between items-center">
         <h3 className="text-xl md:text-2xl font-black text-[#D4AF37] uppercase tracking-tighter italic">
           {t.title}
@@ -77,14 +77,14 @@ const Dashboard = ({ lang }) => {
         )}
       </div>
 
-      {/* Stats Grid */}
+      {/* ২. স্ট্যাটাস গ্রিড কার্ডস */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {stats.map((s, i) => (
           <div key={i} className="bg-[#111111] p-6 rounded-[24px] border border-[#D4AF37]/10 group hover:border-[#D4AF37]/30 transition-all">
             <s.icon className="text-[#D4AF37] mb-4" size={20} />
             <p className="text-gray-500 text-[10px] uppercase font-bold mb-1">{s.label}</p>
             {isEditing ? (
-              <input type="number" value={tempData[s.key]} onChange={(e) => setTempData({...tempData, [s.key]: parseInt(e.target.value) || 0})} className="bg-black/50 border border-[#D4AF37]/50 text-[#D4AF37] text-2xl font-black w-full rounded-lg px-2 outline-none" />
+              <input type="number" value={tempData[s.key]} onChange={(e) => setTempData({...tempData, [s.key]: parseInt(e.target.value) || 0})} className="bg-black/50 border border-[#D4AF37]/50 text-[#D4AF37] text-2xl font-black w-full rounded-lg px-2 outline-none focus:border-[#D4AF37]" />
             ) : (
               <h4 className="text-2xl md:text-4xl font-black text-white">{loading ? "..." : s.value.toLocaleString()}</h4>
             )}
@@ -92,7 +92,7 @@ const Dashboard = ({ lang }) => {
         ))}
       </div>
 
-      {/* সাম্প্রতিক শিডিউল (Single Balanced Section) */}
+      {/* ৩. সাম্প্রতিক শিডিউল (শুধুমাত্র একটিই কার্ড) */}
       <div className="bg-[#111111] rounded-[30px] border border-white/5 overflow-hidden">
         <div className="p-6 md:p-8 border-b border-white/5 flex justify-between items-center">
           <h3 className="text-[#D4AF37] font-black uppercase tracking-widest text-sm italic">
@@ -123,7 +123,7 @@ const Dashboard = ({ lang }) => {
                     <td className="p-6">
                       <div className="flex items-center gap-4">
                         <div className="h-10 w-10 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] font-black text-xs">
-                          {app.name.charAt(0)}
+                          {app.name?.charAt(0) || 'P'}
                         </div>
                         <div>
                           <p className="text-white font-bold text-sm">{app.name}</p>
@@ -142,7 +142,7 @@ const Dashboard = ({ lang }) => {
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan="2" className="p-10 text-center text-gray-600 text-[10px] uppercase tracking-widest italic">No Data</td></tr>
+                <tr><td colSpan="2" className="p-10 text-center text-gray-600 text-[10px] uppercase tracking-widest italic">No Schedule Found</td></tr>
               )}
             </tbody>
           </table>
