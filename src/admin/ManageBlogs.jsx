@@ -3,15 +3,15 @@ import { Save, Image as ImageIcon, Type, Layout, Trash2, Edit, X } from 'lucide-
 import axios from 'axios';
 
 const ManageBlogs = ({ lang }) => {
-  // ব্যাকএন্ড লিঙ্ক (Render লিঙ্ক ব্যবহার করা হয়েছে)
-const API_URL = "https://st-dental-backend.vercel.app/api/blogs";
+  // ব্যাকএন্ড লিঙ্ক
+  const API_URL = "https://st-dental-backend.vercel.app/api/blogs";
   const [blogs, setBlogs] = useState([]);
   const [blogData, setBlogData] = useState({ title: '', category: 'Dental Care', image: '', content: '' });
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  // ১. সব ব্লগ ডাটাবেজ থেকে নিয়ে আসা
+  // ১. সব ব্লগ ডাটাবেজ থেকে নিয়ে আসা
   const fetchBlogs = async () => {
     try {
       const res = await axios.get(API_URL);
@@ -32,7 +32,7 @@ const API_URL = "https://st-dental-backend.vercel.app/api/blogs";
     try {
       if (isEditing) {
         await axios.put(`${API_URL}/${editId}`, blogData);
-        alert(lang === 'bn' ? "ব্লগ আপডেট হয়েছে!" : "Blog updated successfully!");
+        alert(lang === 'bn' ? "ব্লগ আপডেট হয়েছে!" : "Blog updated successfully!");
       } else {
         await axios.post(API_URL, blogData);
         alert(lang === 'bn' ? "ব্লগ সফলভাবে পাবলিশ হয়েছে!" : "Blog published successfully!");
@@ -67,7 +67,7 @@ const API_URL = "https://st-dental-backend.vercel.app/api/blogs";
       title: blog.title,
       category: blog.category,
       image: blog.image,
-      content: blog.content // description এর বদলে content
+      content: blog.content
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -108,7 +108,17 @@ const API_URL = "https://st-dental-backend.vercel.app/api/blogs";
 
           <div className="flex flex-col gap-2">
             <label className="text-[10px] uppercase font-bold text-gray-500 flex items-center gap-2"><ImageIcon size={12}/> Image URL</label>
-            <input required type="text" value={blogData.image} onChange={(e)=>setBlogData({...blogData, image: e.target.value})} className="bg-black/50 border border-white/5 p-4 rounded-2xl outline-none focus:border-[#D4AF37] text-white" placeholder="https://image-link.com/photo.jpg" />
+            <div className="flex flex-col md:flex-row gap-4 items-start">
+                <input required type="text" value={blogData.image} onChange={(e)=>setBlogData({...blogData, image: e.target.value})} className="bg-black/50 border border-white/5 p-4 rounded-2xl outline-none focus:border-[#D4AF37] text-white w-full" placeholder="https://image-link.com/photo.jpg" />
+                {blogData.image && (
+                    <img 
+                        src={blogData.image} 
+                        alt="Preview" 
+                        className="w-20 h-20 object-cover rounded-xl border border-[#D4AF37]/30"
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/400'; }}
+                    />
+                )}
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
@@ -130,9 +140,10 @@ const API_URL = "https://st-dental-backend.vercel.app/api/blogs";
           </h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="w-full text-left border-collapse">
             <thead className="bg-black/30 text-gray-500 text-[10px] uppercase font-bold">
               <tr>
+                <th className="p-6">Image</th>
                 <th className="p-6">Title</th>
                 <th className="p-6">Category</th>
                 <th className="p-6 text-center">Action</th>
@@ -141,9 +152,17 @@ const API_URL = "https://st-dental-backend.vercel.app/api/blogs";
             <tbody className="divide-y divide-white/5">
               {blogs.map((blog) => (
                 <tr key={blog._id} className="hover:bg-white/[0.02] transition-all">
-                  <td className="p-6 font-bold text-gray-200">{blog.title}</td>
                   <td className="p-6">
-                    <span className="text-[#D4AF37] text-[10px] font-black uppercase border border-[#D4AF37]/20 px-3 py-1 rounded-full">
+                    <img 
+                        src={blog.image || 'https://via.placeholder.com/400'} 
+                        alt={blog.title} 
+                        className="w-16 h-10 object-cover rounded-lg border border-white/10"
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/400'; }}
+                    />
+                  </td>
+                  <td className="p-6 font-bold text-gray-200 min-w-[200px]">{blog.title}</td>
+                  <td className="p-6">
+                    <span className="text-[#D4AF37] text-[10px] font-black uppercase border border-[#D4AF37]/20 px-3 py-1 rounded-full whitespace-nowrap">
                       {blog.category}
                     </span>
                   </td>
