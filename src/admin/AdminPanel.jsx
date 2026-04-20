@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, MessageSquare, LogOut, Edit, Trash2, CheckCircle, Menu, X, Save, Clock, Calendar, FileText, Globe } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, LogOut, Edit, Trash2, CheckCircle, Menu, X, Save, Clock, Calendar, FileText, Globe, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
@@ -49,16 +49,18 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
       noDate: "No Date", noTime: "No Time",
       table: { name: "Patient", info: "Service & Time", status: "Status", action: "Action" },
       deleteConfirm: "Are you sure you want to delete?",
-      superAdmin: "Super Admin"
+      superAdmin: "Super Admin",
+      blogActions: { add: "Add New Blog", edit: "Edit Blog", save: "Save Blog", delete: "Delete" }
     },
     bn: {
       dash: "ড্যাশবোর্ড", appt: "অ্যাপয়েন্টমেন্ট", rev: "রিভিউ", blog: "ব্লগ", logout: "লগআউট",
       welcome: "স্বাগতম,", subtitle: "ডেন্টাল এবং ফেসিয়াল ক্লিনিক পরিচালনা করুন।",
       recent: "সাম্প্রতিক শিডিউল", viewAll: "সব দেখুন", loading: "লোড হচ্ছে...",
-      noDate: "তারিখ নেই", noTime: "সময় নেই",
+      noDate: "তারিখ নেই", noTime: "সময় নেই",
       table: { name: "রোগী", info: "সেবা ও সময়", status: "অবস্থা", action: "অ্যাকশন" },
       deleteConfirm: "আপনি কি এটি ডিলিট করতে চান?",
-      superAdmin: "সুপার এডমিন"
+      superAdmin: "সুপার এডমিন",
+      blogActions: { add: "নতুন ব্লগ লিখুন", edit: "এডিট করুন", save: "সেভ করুন", delete: "ডিলিট" }
     }
   }[lang];
 
@@ -145,7 +147,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
         {/* Sub-Components with Dynamic Lang */}
         <AnimatePresence mode="wait">
           <motion.div 
-            key={activeTab + lang} // এখানে ল্যাঙ্গুয়েজ যোগ করায় ট্যাব বা ভাষা বদলালে কন্টেন্ট রিফ্রেশ হবে
+            key={activeTab + lang} 
             initial={{ opacity: 0, y: 10 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ duration: 0.3 }}
@@ -153,7 +155,12 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
             {activeTab === 'dashboard' && <Dashboard lang={lang} />}
             {activeTab === 'appointments' && <ManageAppointments lang={lang} />}
             {activeTab === 'reviews' && <ManageReviews lang={lang} />}
-            {activeTab === 'blogs' && <ManageBlogs lang={lang} />} 
+            {activeTab === 'blogs' && (
+              <ManageBlogs 
+                lang={lang} 
+                t={t.blogActions} // ব্লগের জন্য অ্যাকশন টেক্সট পাস করা হচ্ছে
+              />
+            )} 
           </motion.div>
         </AnimatePresence>
 
