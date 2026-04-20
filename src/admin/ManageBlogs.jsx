@@ -4,8 +4,7 @@ import axios from 'axios';
 
 const ManageBlogs = ({ lang }) => {
   // ব্যাকএন্ড লিঙ্ক (Render লিঙ্ক ব্যবহার করা হয়েছে)
-  const API_URL = "https://st-dental-backend.onrender.com/api/blogs";
-
+const API_URL = "https://st-dental-backend.vercel.app/api/blogs";
   const [blogs, setBlogs] = useState([]);
   const [blogData, setBlogData] = useState({ title: '', category: 'Dental Care', image: '', content: '' });
   const [loading, setLoading] = useState(false);
