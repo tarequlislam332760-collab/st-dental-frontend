@@ -15,9 +15,9 @@ import DentalCare from './sections/DentalCare';
 import SkinCare from './sections/SkinCare';
 import Testimonials from './sections/Testimonials';
 
-// --- নতুন যোগ করা ফাইল ইম্পোর্ট ---
-import TransformSidebar from './sections/TransformSidebar';
-import BeforeAfterSidebar from './sections/BeforeAfterSidebar';
+// বানানের দিকে খেয়াল রাখুন: Slider নাকি Sidebar
+import TransformSlider from "./components/TransformSlider.jsx";
+import BeforeAfterSlider from "./components/BeforeAfterSlider.jsx";
 
 // --- অ্যাডমিন প্যানেল ইম্পোর্ট ---
 import AdminPanel from './admin/AdminPanel';
@@ -212,8 +212,8 @@ const AppContent = () => {
         <Route path="/contact" element={<Contact lang={lang} />} />
         <Route path="/dental-care" element={<DentalCare lang={lang} />} />
         <Route path="/skin-care" element={<SkinCare lang={lang} />} />
-        <Route path="/transform" element={<TransformSidebar lang={lang} />} />
-        <Route path="/before-after" element={<BeforeAfterSidebar lang={lang} />} />
+      <Route path="/transform" element={<TransformSlider lang={lang} />} />
+  <Route path="/before-after" element={<BeforeAfterSlider lang={lang} />} />
         <Route path="/appointment" element={<Appointment lang={lang} />} />
         <Route path="/testimonials" element={<Testimonials lang={lang} />} />
         
