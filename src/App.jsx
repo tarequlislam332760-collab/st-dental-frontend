@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, NavLink, useLocation } from 'react-router-dom';
-import * as Lucide from 'lucide-react'; 
+import * as Lucide from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- পেজ এবং সেকশন ইম্পোর্ট ---
@@ -15,7 +15,6 @@ import DentalCare from './sections/DentalCare';
 import SkinCare from './sections/SkinCare';
 import Testimonials from './sections/Testimonials';
 
-// বানানের দিকে খেয়াল রাখুন: Slider নাকি Sidebar
 import TransformSlider from "./components/TransformSlider.jsx";
 import BeforeAfterSlider from "./components/BeforeAfterSlider.jsx";
 
@@ -29,7 +28,7 @@ const SafeIcon = ({ name, size = 20, className = "" }) => {
   return <IconComponent size={size} className={className} />;
 };
 
-// --- ১০টি ভাষার ডাটাবেস (Blog & Slider fixed for all languages) ---
+// --- ১০টি ভাষার ডাটাবেস ---
 const translations = {
   bn: {
     home: "হোম", services: "সেবা", about: "আমাদের সম্পর্কে", contact: "যোগাযোগ",
@@ -52,7 +51,7 @@ const translations = {
     ]
   },
   ar: { home: "الصفحة الرئيسية", services: "خدمات", about: "حول", contact: "اتصال", dental: "عناية بالأسنان", skin: "العناية بالبشرة", treatment: "علاج", testimonials: "شهادات", btn: "حجز موعد", call: "اتصل الآن", whatsapp: "واتساب", blog: "مدونة", transform: "تحويل", beforeAfter: "قبل وبعد" },
-  hi: { home: "होम", services: "सेवाएं", about: "हमारे बारे में", contact: "संपर्क", dental: "দন্ত চিকিৎসা", skin: "ত্বचा की देखभाल", treatment: "उपचार", testimonials: "प्रमाणपत्र", btn: "अपॉइंटमेंट लें", call: "अभी কল करें", whatsapp: "व्हाट्सएप", blog: "ब्लॉग", transform: "ट्रांसफॉर्म", beforeAfter: "पहले और बाद में" },
+  hi: { home: "होम", services: "सेवाएं", about: "हमारे बारे में", contact: "संपर्क", dental: "दंत चिकित्सा", skin: "त्वचा की देखभाल", treatment: "उपचार", testimonials: "प्रमाणपत्र", btn: "अपॉइंटमेंट लें", call: "अभी कॉल करें", whatsapp: "व्हाट्सएप", blog: "ब्लॉग", transform: "ट्रांसफॉर्म", beforeAfter: "पहले और बाद में" },
   es: { home: "Inicio", services: "Servicios", about: "Nosotros", contact: "Contacto", dental: "Cuidado Dental", skin: "Cuidado Piel", treatment: "Tratamiento", testimonials: "Testimonios", btn: "Reservar", call: "Llamar", whatsapp: "WhatsApp", blog: "Blog", transform: "Transformar", beforeAfter: "Antes y Después" },
   fr: { home: "Accueil", services: "Services", about: "À propos", contact: "Contact", dental: "Soin Dentaire", skin: "Soin Peau", treatment: "Traitement", testimonials: "Témoignages", btn: "Réserver", call: "Appeler", whatsapp: "WhatsApp", blog: "Blog", transform: "Transformer", beforeAfter: "Avant/Après" },
   de: { home: "Startseite", services: "Dienste", about: "Über uns", contact: "Kontakt", dental: "Zahnpflege", skin: "Hautpflege", treatment: "Behandlung", testimonials: "Referenzen", btn: "Buchen", call: "Anrufen", whatsapp: "WhatsApp", blog: "Blog", transform: "Verwandeln", beforeAfter: "Vorher/Nachher" },
@@ -62,21 +61,30 @@ const translations = {
 };
 
 const languages = [
-  { code: 'en', name: 'English' }, { code: 'bn', name: 'বাংলা' }, { code: 'ar', name: 'العربية' },
-  { code: 'hi', name: 'हिन्दी' }, { code: 'es', name: 'Español' }, { code: 'fr', name: 'Français' },
-  { code: 'de', name: 'Deutsch' }, { code: 'zh', name: '中文' }, { code: 'ru', name: 'Русский' }, { code: 'tr', name: 'Türkçe' }
+  { code: 'en', name: 'English',    flag: '🇬🇧' },
+  { code: 'bn', name: 'বাংলা',      flag: '🇧🇩' },
+  { code: 'ar', name: 'العربية',    flag: '🇸🇦' },
+  { code: 'hi', name: 'हिन्दी',     flag: '🇮🇳' },
+  { code: 'es', name: 'Español',    flag: '🇪🇸' },
+  { code: 'fr', name: 'Français',   flag: '🇫🇷' },
+  { code: 'de', name: 'Deutsch',    flag: '🇩🇪' },
+  { code: 'zh', name: '中文',        flag: '🇨🇳' },
+  { code: 'ru', name: 'Русский',    flag: '🇷🇺' },
+  { code: 'tr', name: 'Türkçe',     flag: '🇹🇷' },
 ];
 
 const AppContent = () => {
   const [lang, setLang] = useState('bn');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobileTreatmentOpen, setIsMobileTreatmentOpen] = useState(false); 
+  const [isMobileTreatmentOpen, setIsMobileTreatmentOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isTreatmentOpen, setIsTreatmentOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
 
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/st-admin-secure');
+
+  const currentLang = languages.find(l => l.code === lang) || languages[0];
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -94,12 +102,11 @@ const AppContent = () => {
     return () => window.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // Use a fallback to 'en' if the current lang isn't in translations
   const t = translations[lang] || translations['en'];
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#1a1a1a] overflow-x-hidden">
-      
+
       {!isAdminPath && (
         <header className={`fixed top-0 w-full z-[100] transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md py-2' : 'bg-white py-4'}`}>
           <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between">
@@ -110,7 +117,7 @@ const AppContent = () => {
                 <p className="text-[#D4AF37] text-[7px] md:text-[9px] font-bold uppercase tracking-widest">Dental & Aesthetic Care</p>
               </div>
             </Link>
-            
+
             <nav className="hidden lg:flex items-center gap-8">
               {[
                 { name: t.home, path: "/" },
@@ -146,21 +153,32 @@ const AppContent = () => {
             </nav>
 
             <div className="flex items-center gap-2 md:gap-4">
+              {/* Language Dropdown with Flags */}
               <div className="relative" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-1 bg-gray-50 border border-gray-200 px-3 py-2 rounded-full text-[10px] font-black hover:border-[#D4AF37]">
-                  <SafeIcon name="Globe" size={14} className="text-[#D4AF37]" />
-                  <span className="uppercase">{lang}</span>
+                <button
+                  onClick={() => setIsLangOpen(!isLangOpen)}
+                  className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 py-2 rounded-full text-[10px] font-black hover:border-[#D4AF37] transition-all"
+                >
+                  <span className="text-base leading-none">{currentLang.flag}</span>
+                  <span className="uppercase hidden sm:inline">{currentLang.code}</span>
+                  <SafeIcon name="ChevronDown" size={12} className={`text-gray-400 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isLangOpen && (
-                  <div className="absolute top-full right-0 w-36 bg-white shadow-xl border-t-2 border-[#D4AF37] mt-1 rounded-lg max-h-60 overflow-y-auto z-[110]">
+                  <div className="absolute top-full right-0 w-44 bg-white shadow-xl border-t-2 border-[#D4AF37] mt-1 rounded-lg max-h-64 overflow-y-auto z-[110]">
                     {languages.map((l) => (
-                      <button key={l.code} onClick={() => { setLang(l.code); setIsLangOpen(false); }} className={`block w-full text-left px-4 py-2.5 text-[10px] font-bold hover:bg-gray-50 ${lang === l.code ? 'text-[#D4AF37]' : 'text-gray-700'}`}>
-                        {l.name}
+                      <button
+                        key={l.code}
+                        onClick={() => { setLang(l.code); setIsLangOpen(false); }}
+                        className={`flex items-center gap-3 w-full text-left px-4 py-2.5 text-[11px] font-bold hover:bg-gray-50 transition-colors ${lang === l.code ? 'text-[#D4AF37]' : 'text-gray-700'}`}
+                      >
+                        <span className="text-base">{l.flag}</span>
+                        <span>{l.name}</span>
                       </button>
                     ))}
                   </div>
                 )}
               </div>
+
               <Link to="/appointment" className="hidden sm:block">
                 <button className="bg-[#1a1a1a] text-[#D4AF37] border border-[#D4AF37] px-5 py-2.5 rounded-full font-bold text-[10px] uppercase hover:bg-[#D4AF37] hover:text-white transition-all shadow-md">{t.btn}</button>
               </Link>
@@ -173,9 +191,9 @@ const AppContent = () => {
       <AnimatePresence>
         {isMobileMenuOpen && !isAdminPath && (
           <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => {setIsMobileMenuOpen(false); setIsMobileTreatmentOpen(false);}} className="fixed inset-0 bg-black/60 z-[150] backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setIsMobileMenuOpen(false); setIsMobileTreatmentOpen(false); }} className="fixed inset-0 bg-black/60 z-[150] backdrop-blur-sm" />
             <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="fixed right-0 top-0 h-full w-[280px] bg-white z-[200] shadow-2xl p-8 flex flex-col">
-              <button onClick={() => {setIsMobileMenuOpen(false); setIsMobileTreatmentOpen(false);}} className="self-end p-2 bg-gray-100 rounded-full mb-8"><SafeIcon name="X" size={20} /></button>
+              <button onClick={() => { setIsMobileMenuOpen(false); setIsMobileTreatmentOpen(false); }} className="self-end p-2 bg-gray-100 rounded-full mb-8"><SafeIcon name="X" size={20} /></button>
               <nav className="flex flex-col gap-6 font-bold uppercase text-sm tracking-widest text-gray-800">
                 <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>{t.home}</Link>
                 <Link to="/services" onClick={() => setIsMobileMenuOpen(false)}>{t.services}</Link>
@@ -196,6 +214,22 @@ const AppContent = () => {
                     <Link to="/before-after" className="text-[#D4AF37] text-xs" onClick={() => setIsMobileMenuOpen(false)}>{t.beforeAfter}</Link>
                   </motion.div>
                 )}
+
+                {/* Mobile Language Selector with Flags */}
+                <div className="h-[1px] bg-gray-100 w-full my-2"></div>
+                <div className="grid grid-cols-2 gap-2">
+                  {languages.map((l) => (
+                    <button
+                      key={l.code}
+                      onClick={() => { setLang(l.code); setIsMobileMenuOpen(false); }}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-bold border transition-all ${lang === l.code ? 'border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5' : 'border-gray-100 text-gray-500 hover:border-gray-300'}`}
+                    >
+                      <span className="text-sm">{l.flag}</span>
+                      <span>{l.name}</span>
+                    </button>
+                  ))}
+                </div>
+
                 <Link to="/appointment" onClick={() => setIsMobileMenuOpen(false)} className="mt-4 bg-[#D4AF37] text-white py-3 px-6 rounded-lg text-center text-xs">{t.btn}</Link>
               </nav>
             </motion.div>
@@ -206,7 +240,7 @@ const AppContent = () => {
       {!isAdminPath && <WhatsAppWidget lang={lang} />}
 
       <Routes>
-        <Route path="/" element={<Home lang={lang} />} /> 
+        <Route path="/" element={<Home lang={lang} />} />
         <Route path="/blog" element={<Blog lang={lang} />} />
         <Route path="/services" element={<Services lang={lang} />} />
         <Route path="/about" element={<About lang={lang} />} />
@@ -217,16 +251,15 @@ const AppContent = () => {
         <Route path="/before-after" element={<BeforeAfterSlider lang={lang} />} />
         <Route path="/appointment" element={<Appointment lang={lang} />} />
         <Route path="/testimonials" element={<Testimonials lang={lang} />} />
-        
-        <Route path="/st-admin-secure/login" element={<Login />} />
 
-        <Route 
-          path="/st-admin-secure/*" 
+        <Route path="/st-admin-secure/login" element={<Login />} />
+        <Route
+          path="/st-admin-secure/*"
           element={
             <ProtectedRoute>
               <AdminPanel lang={lang} />
             </ProtectedRoute>
-          }   
+          }
         />
       </Routes>
 
@@ -236,7 +269,7 @@ const AppContent = () => {
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-[#D4AF37] rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-xl">ST</div>
-                <h3 className="font-black uppercase text-xl tracking-tighter leading-none">S T LESSER <br/><span className="text-[#D4AF37] text-sm">Dental & Aesthetic</span></h3>
+                <h3 className="font-black uppercase text-xl tracking-tighter leading-none">S T LESSER <br /><span className="text-[#D4AF37] text-sm">Dental & Aesthetic</span></h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
                 {lang === 'bn' ? 'মৌলভীবাজারের অন্যতম আধুনিক ডেন্টাল এবং স্কিন কেয়ার সেন্টার।' : "Sylhet & Moulvibazar's premier dental clinic with modern technology."}
