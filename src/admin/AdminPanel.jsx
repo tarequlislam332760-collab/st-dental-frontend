@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, MessageSquare, LogOut, Edit, Trash2, CheckCircle, Menu, X, Save, Clock, Calendar, FileText, Globe, Plus } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, LogOut, Trash2, Menu, X, Clock, Calendar, FileText, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
@@ -7,7 +7,7 @@ import axios from 'axios';
 import Dashboard from './Dashboard';
 import ManageAppointments from './ManageAppointments';
 import ManageReviews from './ManageReviews';
-import ManageBlogs from './ManageBlogs'; 
+import ManageBlogs from './ManageBlogs';
 
 const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   const [lang, setLang] = useState(initialLang);
@@ -16,14 +16,13 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // আপনার Render ব্যাকএন্ড ইউআরএল এখানে দিন
-  const API_URL = "https://st-dental-backend.onrender.com/api";
+  const API_URL = "https://st-dental-backend.vercel.app/api";
 
   const fetchRecentData = async () => {
     try {
       setLoading(true);
       const res = await axios.get(`${API_URL}/appointments`);
-      setRecentAppointments(res.data.slice(0, 8)); 
+      setRecentAppointments(res.data.slice(0, 8));
       setLoading(false);
     } catch (err) {
       console.error("Error fetching admin data:", err);
@@ -32,8 +31,8 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   };
 
   useEffect(() => {
-    fetchRecentData();
-  }, []);
+    if (activeTab === 'dashboard') fetchRecentData();
+  }, [activeTab]);
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -68,7 +67,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   }[lang];
 
   const handleDelete = async (id) => {
-    if(window.confirm(t.deleteConfirm)) {
+    if (window.confirm(t.deleteConfirm)) {
       try {
         await axios.delete(`${API_URL}/appointments/${id}`);
         fetchRecentData();
@@ -80,7 +79,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
 
   return (
     <div className="flex min-h-screen bg-[#050505] text-white font-sans selection:bg-[#D4AF37] selection:text-black relative">
-      
+
       {/* Mobile Toggle & Lang Toggle */}
       <div className="md:hidden fixed top-4 right-4 z-[60] flex gap-2">
         <button onClick={toggleLang} className="p-3 bg-white/5 text-[#D4AF37] rounded-xl border border-white/10 shadow-lg uppercase text-[10px] font-black">
@@ -105,13 +104,13 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
             { id: 'reviews', label: t.rev, icon: MessageSquare },
             { id: 'blogs', label: t.blog, icon: FileText },
           ].map((item) => (
-            <button 
+            <button
               key={item.id}
               onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
               className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
-                activeTab === item.id 
-                ? 'bg-[#D4AF37] text-black font-bold shadow-lg' 
-                : 'hover:bg-white/5 text-gray-500 hover:text-[#D4AF37]'
+                activeTab === item.id
+                  ? 'bg-[#D4AF37] text-black font-bold shadow-lg'
+                  : 'hover:bg-white/5 text-gray-500 hover:text-[#D4AF37]'
               }`}
             >
               <item.icon size={18} /> {item.label}
@@ -119,9 +118,8 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
           ))}
         </nav>
 
-        {/* Language Switcher in Sidebar (Desktop) */}
         <button onClick={toggleLang} className="mb-4 flex items-center gap-4 px-4 py-3 text-[#D4AF37] bg-white/5 rounded-xl font-bold transition-all border border-white/5 hover:border-[#D4AF37]/30 uppercase text-[10px] tracking-widest">
-           <Globe size={16} /> {lang === 'bn' ? 'English Language' : 'বাংলা ভাষা'}
+          <Globe size={16} /> {lang === 'bn' ? 'English Language' : 'বাংলা ভাষা'}
         </button>
 
         <button onClick={handleLogout} className="flex items-center gap-4 px-4 py-3 text-red-500 hover:bg-red-500/10 rounded-xl font-bold transition-all">
@@ -139,44 +137,42 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
             <p className="text-gray-500 text-xs mt-1 uppercase tracking-widest">{t.subtitle}</p>
           </div>
           <div className="flex items-center gap-4">
-              <div className="text-right hidden sm:block">
-                  <p className="text-sm font-bold">Tareq Islam</p>
-                  <p className="text-[10px] text-[#D4AF37] uppercase font-bold tracking-tighter">{t.superAdmin}</p>
-              </div>
-              <div className="w-12 h-12 bg-[#111111] border border-[#D4AF37]/20 rounded-2xl flex items-center justify-center text-[#D4AF37] font-black text-xl shadow-xl">TI</div>
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-bold">Tareq Islam</p>
+              <p className="text-[10px] text-[#D4AF37] uppercase font-bold tracking-tighter">{t.superAdmin}</p>
+            </div>
+            <div className="w-12 h-12 bg-[#111111] border border-[#D4AF37]/20 rounded-2xl flex items-center justify-center text-[#D4AF37] font-black text-xl shadow-xl">TI</div>
           </div>
         </header>
 
-        {/* Sub-Components with Dynamic Lang */}
+        {/* Sub-Components */}
         <AnimatePresence mode="wait">
-          <motion.div 
-            key={activeTab + lang} 
-            initial={{ opacity: 0, y: 10 }} 
-            animate={{ opacity: 1, y: 0 }} 
+          <motion.div
+            key={activeTab + lang}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {activeTab === 'dashboard' && <Dashboard lang={lang} />}
+            {activeTab === 'dashboard' && <Dashboard lang={lang} onNavigate={setActiveTab} />}
             {activeTab === 'appointments' && <ManageAppointments lang={lang} />}
             {activeTab === 'reviews' && <ManageReviews lang={lang} />}
-            {activeTab === 'blogs' && (
-              <ManageBlogs 
-                lang={lang} 
-                t={t.blogActions} 
-              />
-            )} 
+            {activeTab === 'blogs' && <ManageBlogs lang={lang} t={t.blogActions} />}
           </motion.div>
         </AnimatePresence>
 
-        {/* Recent Schedule Table - Dashboard view only */}
+        {/* Recent Schedule — Dashboard tab only */}
         {activeTab === 'dashboard' && (
           <section className="mt-10 bg-[#111111] rounded-[35px] border border-white/5 overflow-hidden shadow-2xl">
             <div className="p-6 md:p-8 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
               <h3 className="text-lg font-black uppercase tracking-widest italic text-[#D4AF37]">{t.recent}</h3>
-              <button onClick={() => setActiveTab('appointments')} className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest border border-[#D4AF37]/20 px-6 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
+              <button
+                onClick={() => setActiveTab('appointments')}
+                className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest border border-[#D4AF37]/20 px-6 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all"
+              >
                 {t.viewAll}
               </button>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full text-left min-w-[600px]">
                 <thead className="bg-black/30 text-gray-500 text-[10px] uppercase tracking-[2px] font-bold">
@@ -189,44 +185,61 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {loading ? (
-                    <tr><td colSpan="4" className="p-10 text-center text-gray-600 animate-pulse uppercase tracking-widest text-xs">{t.loading}</td></tr>
-                  ) : recentAppointments.map((appt) => (
-                    <tr key={appt._id} className="hover:bg-white/[0.01] transition-all">
-                      <td className="p-6">
-                        <p className="font-bold text-gray-200">{appt.name}</p>
-                        <p className="text-xs text-gray-500">{appt.phone}</p>
-                      </td>
-                      <td className="p-6">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[#D4AF37] text-xs font-bold uppercase">
-                            {appt.service || "General Treatment"}
-                          </span>
-                          <div className="flex items-center gap-3 text-[10px] text-gray-500 uppercase font-medium">
-                            <span className="flex items-center gap-1">
-                              <Calendar size={10} /> 
-                              {appt.appointmentDate || appt.date || t.noDate}
+                    <tr>
+                      <td colSpan="4" className="p-10 text-center text-gray-600 animate-pulse uppercase tracking-widest text-xs">{t.loading}</td>
+                    </tr>
+                  ) : recentAppointments.length > 0 ? (
+                    recentAppointments.map((appt) => (
+                      <tr key={appt._id} className="hover:bg-white/[0.01] transition-all">
+                        <td className="p-6">
+                          <p className="font-bold text-gray-200">{appt.name}</p>
+                          <p className="text-xs text-gray-500">{appt.phone}</p>
+                        </td>
+                        <td className="p-6">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[#D4AF37] text-xs font-bold uppercase">
+                              {appt.service || "General Treatment"}
                             </span>
-                            <span className="flex items-center gap-1">
-                              <Clock size={10} /> 
-                              {appt.timeSlot || appt.time || t.noTime}
-                            </span>
+                            <div className="flex items-center gap-3 text-[10px] text-gray-500 uppercase font-medium">
+                              <span className="flex items-center gap-1">
+                                <Calendar size={10} />
+                                {appt.appointmentDate || appt.date || t.noDate}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock size={10} />
+                                {appt.timeSlot || appt.time || t.noTime}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="p-6">
-                        <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase ${appt.status === 'Confirmed' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
-                          {appt.status || (lang === 'bn' ? 'পেন্ডিং' : 'Pending')}
-                        </span>
-                      </td>
-                      <td className="p-6">
-                        <div className="flex justify-center gap-2">
-                          <button onClick={() => handleDelete(appt._id)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
+                        </td>
+                        <td className="p-6">
+                          <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase ${
+                            appt.status === 'Confirmed'
+                              ? 'bg-green-500/10 text-green-500'
+                              : 'bg-yellow-500/10 text-yellow-500'
+                          }`}>
+                            {appt.status || (lang === 'bn' ? 'পেন্ডিং' : 'Pending')}
+                          </span>
+                        </td>
+                        <td className="p-6">
+                          <div className="flex justify-center gap-2">
+                            <button
+                              onClick={() => handleDelete(appt._id)}
+                              className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="p-10 text-center text-gray-600 text-xs uppercase italic">
+                        {lang === 'bn' ? 'কোনো ডেটা নেই' : 'No data found'}
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
