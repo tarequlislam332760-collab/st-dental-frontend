@@ -3,11 +3,7 @@ import { Calendar, Star, Users, Edit3, Save, X, Clock } from 'lucide-react';
 import axios from 'axios';
 
 const Dashboard = ({ lang }) => {
-  const [statsData, setStatsData] = useState({
-    totalAppointments: 0,
-    newReviews: 0,
-    totalPatients: 0
-  });
+  const [statsData, setStatsData] = useState({ totalAppointments: 0, newReviews: 0, totalPatients: 0 });
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -19,10 +15,8 @@ const Dashboard = ({ lang }) => {
       const resStats = await axios.get('https://st-dental-backend.vercel.app/api/dashboard');
       setStatsData(resStats.data);
       setTempData(resStats.data);
-
       const resApps = await axios.get('https://st-dental-backend.vercel.app/api/appointments');
       setAppointments(resApps.data);
-
       setLoading(false);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -39,9 +33,8 @@ const Dashboard = ({ lang }) => {
       setStatsData(tempData);
       setIsEditing(false);
       setLoading(false);
-      alert(lang === 'bn' ? "ড্যাশবোর্ড আপডেট হয়েছে!" : "Dashboard updated!");
+      alert(lang === 'bn' ? "আপডেট সফল হয়েছে!" : "Update successful!");
     } catch (err) {
-      console.error("Update failed:", err);
       setLoading(false);
     }
   };
@@ -51,56 +44,46 @@ const Dashboard = ({ lang }) => {
     bn: { title: "সারসংক্ষেপ", s1: "মোট অ্যাপয়েন্টমেন্ট", s2: "নতুন রিভিউ", s3: "মোট রোগী", edit: "তথ্য পরিবর্তন", save: "সেভ করুন", cancel: "বাতিল", recent: "সাম্প্রতিক শিডিউল", view: "সব দেখুন", patient: "রোগী", service: "সেবা ও সময়" }
   }[lang];
 
-  const stats = [
-    { key: "totalAppointments", label: t.s1, value: statsData.totalAppointments, icon: Calendar },
-    { key: "newReviews", label: t.s2, value: statsData.newReviews, icon: Star },
-    { key: "totalPatients", label: t.s3, value: statsData.totalPatients, icon: Users },
-  ];
-
   return (
-    <div className="w-full space-y-8 md:space-y-12">
-      {/* Header */}
+    <div className="w-full space-y-8 pb-10">
+      {/* Header & Stats Cards */}
       <div className="flex justify-between items-center">
-        <h3 className="text-xl md:text-2xl font-black text-[#D4AF37] uppercase tracking-tighter italic">
-          {t.title}
-        </h3>
+        <h3 className="text-xl md:text-2xl font-black text-[#D4AF37] uppercase italic">{t.title}</h3>
         {!isEditing ? (
-          <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 bg-[#D4AF37]/10 text-[#D4AF37] px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-[#D4AF37] hover:text-black transition-all">
+          <button onClick={() => setIsEditing(true)} className="bg-[#D4AF37]/10 text-[#D4AF37] px-4 py-2 rounded-full text-[10px] font-black uppercase hover:bg-[#D4AF37] hover:text-black transition-all">
             <Edit3 size={14} /> {t.edit}
           </button>
         ) : (
           <div className="flex gap-2">
-            <button onClick={handleUpdate} className="bg-green-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><Save size={14} /> {t.save}</button>
-            <button onClick={() => setIsEditing(false)} className="bg-red-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><X size={14} /> {t.cancel}</button>
+            <button onClick={handleUpdate} className="bg-green-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase flex items-center gap-2"><Save size={14} /> {t.save}</button>
+            <button onClick={() => setIsEditing(false)} className="bg-red-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase flex items-center gap-2"><X size={14} /> {t.cancel}</button>
           </div>
         )}
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        {stats.map((s, i) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { key: "totalAppointments", label: t.s1, val: statsData.totalAppointments, icon: Calendar },
+          { key: "newReviews", label: t.s2, val: statsData.newReviews, icon: Star },
+          { key: "totalPatients", label: t.s3, val: statsData.totalPatients, icon: Users },
+        ].map((s, i) => (
           <div key={i} className="bg-[#111111] p-6 rounded-[24px] border border-[#D4AF37]/10">
             <s.icon className="text-[#D4AF37] mb-4" size={20} />
             <p className="text-gray-500 text-[10px] uppercase font-bold mb-1">{s.label}</p>
             {isEditing ? (
               <input type="number" value={tempData[s.key]} onChange={(e) => setTempData({...tempData, [s.key]: parseInt(e.target.value) || 0})} className="bg-black/50 border border-[#D4AF37]/50 text-[#D4AF37] text-2xl font-black w-full rounded-lg px-2 outline-none" />
             ) : (
-              <h4 className="text-2xl md:text-4xl font-black text-white">{loading ? "..." : s.value.toLocaleString()}</h4>
+              <h4 className="text-2xl md:text-4xl font-black text-white">{loading ? "..." : s.val.toLocaleString()}</h4>
             )}
           </div>
         ))}
       </div>
 
-      {/* সাম্প্রতিক শিডিউল (একদম সঠিক কার্ড) */}
+      {/* সাম্প্রতিক শিডিউল (শুধুমাত্র এই একটি কার্ডই থাকবে) */}
       <div className="bg-[#111111] rounded-[40px] border border-white/5 overflow-hidden">
         <div className="p-8 border-b border-white/5 flex flex-col items-center gap-4">
-          <h3 className="text-[#D4AF37] font-black uppercase tracking-widest text-base italic text-center">
-            {t.recent}
-          </h3>
-          <button 
-            onClick={() => window.location.href = '/appointments'} 
-            className="text-[10px] font-black uppercase text-[#D4AF37] border border-[#D4AF37]/30 px-6 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all"
-          >
+          <h3 className="text-[#D4AF37] font-black uppercase tracking-widest text-base italic text-center">{t.recent}</h3>
+          <button onClick={() => window.location.href = '/appointments'} className="text-[10px] font-black uppercase text-[#D4AF37] border border-[#D4AF37]/30 px-6 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
             {t.view}
           </button>
         </div>
