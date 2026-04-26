@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, MessageSquare, LogOut, Trash2, Menu, X, Clock, Calendar, FileText, Globe } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, LogOut, Trash2, Menu, X, Clock, Calendar, FileText, Globe, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
-// সাব-কম্পোনেন্টগুলো
 import Dashboard from './Dashboard';
 import ManageAppointments from './ManageAppointments';
 import ManageReviews from './ManageReviews';
 import ManageBlogs from './ManageBlogs';
+import ManageSiteContent from './ManageSiteContent';
 
 const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   const [lang, setLang] = useState(initialLang);
@@ -39,13 +39,12 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
     window.location.href = '/st-admin-secure/login';
   };
 
-  const toggleLang = () => {
-    setLang(prev => (prev === 'bn' ? 'en' : 'bn'));
-  };
+  const toggleLang = () => setLang(prev => prev === 'bn' ? 'en' : 'bn');
 
   const t = {
     en: {
-      dash: "Dashboard", appt: "Appointments", rev: "Reviews", blog: "Blogs", logout: "Logout",
+      dash: "Dashboard", appt: "Appointments", rev: "Reviews", blog: "Blogs",
+      site: "Site Content", logout: "Logout",
       welcome: "Welcome back,", subtitle: "Manage your dental & facial clinic.",
       recent: "Recent Schedule", viewAll: "View All", loading: "Loading Data...",
       noDate: "No Date", noTime: "No Time",
@@ -55,7 +54,8 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
       blogActions: { add: "Add New Blog", edit: "Edit Blog", save: "Save Blog", delete: "Delete" }
     },
     bn: {
-      dash: "ড্যাশবোর্ড", appt: "অ্যাপয়েন্টমেন্ট", rev: "রিভিউ", blog: "ব্লগ", logout: "লগআউট",
+      dash: "ড্যাশবোর্ড", appt: "অ্যাপয়েন্টমেন্ট", rev: "রিভিউ", blog: "ব্লগ",
+      site: "সাইট কন্টেন্ট", logout: "লগআউট",
       welcome: "স্বাগতম,", subtitle: "ডেন্টাল এবং ফেসিয়াল ক্লিনিক পরিচালনা করুন।",
       recent: "সাম্প্রতিক শিডিউল", viewAll: "সব দেখুন", loading: "লোড হচ্ছে...",
       noDate: "তারিখ নেই", noTime: "সময় নেই",
@@ -77,10 +77,18 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
     }
   };
 
+  const navItems = [
+    { id: 'dashboard',    label: t.dash,  icon: LayoutDashboard },
+    { id: 'appointments', label: t.appt,  icon: Users },
+    { id: 'reviews',      label: t.rev,   icon: MessageSquare },
+    { id: 'blogs',        label: t.blog,  icon: FileText },
+    { id: 'sitecontent',  label: t.site,  icon: Settings },
+  ];
+
   return (
     <div className="flex min-h-screen bg-[#050505] text-white font-sans selection:bg-[#D4AF37] selection:text-black relative">
 
-      {/* Mobile Toggle & Lang Toggle */}
+      {/* Mobile Toggle */}
       <div className="md:hidden fixed top-4 right-4 z-[60] flex gap-2">
         <button onClick={toggleLang} className="p-3 bg-white/5 text-[#D4AF37] rounded-xl border border-white/10 shadow-lg uppercase text-[10px] font-black">
           {lang === 'bn' ? 'EN' : 'BN'}
@@ -98,12 +106,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
           </h1>
         </div>
         <nav className="flex-1 space-y-2">
-          {[
-            { id: 'dashboard', label: t.dash, icon: LayoutDashboard },
-            { id: 'appointments', label: t.appt, icon: Users },
-            { id: 'reviews', label: t.rev, icon: MessageSquare },
-            { id: 'blogs', label: t.blog, icon: FileText },
-          ].map((item) => (
+          {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
@@ -127,7 +130,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
         </button>
       </aside>
 
-      {/* Main Content */}
+      {/* Main */}
       <main className="flex-1 md:ml-64 p-4 md:p-8 lg:p-10 w-full overflow-hidden">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
           <div>
@@ -145,7 +148,6 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
           </div>
         </header>
 
-        {/* Sub-Components */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab + lang}
@@ -153,26 +155,23 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {activeTab === 'dashboard' && <Dashboard lang={lang} onNavigate={setActiveTab} />}
+            {activeTab === 'dashboard'    && <Dashboard lang={lang} onNavigate={setActiveTab} />}
             {activeTab === 'appointments' && <ManageAppointments lang={lang} />}
-            {activeTab === 'reviews' && <ManageReviews lang={lang} />}
-            {activeTab === 'blogs' && <ManageBlogs lang={lang} t={t.blogActions} />}
+            {activeTab === 'reviews'      && <ManageReviews lang={lang} />}
+            {activeTab === 'blogs'        && <ManageBlogs lang={lang} t={t.blogActions} />}
+            {activeTab === 'sitecontent'  && <ManageSiteContent lang={lang} />}
           </motion.div>
         </AnimatePresence>
 
-        {/* Recent Schedule — Dashboard tab only */}
+        {/* Recent Schedule — Dashboard only */}
         {activeTab === 'dashboard' && (
           <section className="mt-10 bg-[#111111] rounded-[35px] border border-white/5 overflow-hidden shadow-2xl">
             <div className="p-6 md:p-8 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
               <h3 className="text-lg font-black uppercase tracking-widest italic text-[#D4AF37]">{t.recent}</h3>
-              <button
-                onClick={() => setActiveTab('appointments')}
-                className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest border border-[#D4AF37]/20 px-6 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all"
-              >
+              <button onClick={() => setActiveTab('appointments')} className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest border border-[#D4AF37]/20 px-6 py-2 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
                 {t.viewAll}
               </button>
             </div>
-
             <div className="overflow-x-auto">
               <table className="w-full text-left min-w-[600px]">
                 <thead className="bg-black/30 text-gray-500 text-[10px] uppercase tracking-[2px] font-bold">
@@ -185,60 +184,35 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {loading ? (
-                    <tr>
-                      <td colSpan="4" className="p-10 text-center text-gray-600 animate-pulse uppercase tracking-widest text-xs">{t.loading}</td>
-                    </tr>
-                  ) : recentAppointments.length > 0 ? (
-                    recentAppointments.map((appt) => (
-                      <tr key={appt._id} className="hover:bg-white/[0.01] transition-all">
-                        <td className="p-6">
-                          <p className="font-bold text-gray-200">{appt.name}</p>
-                          <p className="text-xs text-gray-500">{appt.phone}</p>
-                        </td>
-                        <td className="p-6">
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[#D4AF37] text-xs font-bold uppercase">
-                              {appt.service || "General Treatment"}
-                            </span>
-                            <div className="flex items-center gap-3 text-[10px] text-gray-500 uppercase font-medium">
-                              <span className="flex items-center gap-1">
-                                <Calendar size={10} />
-                                {appt.appointmentDate || appt.date || t.noDate}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock size={10} />
-                                {appt.timeSlot || appt.time || t.noTime}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="p-6">
-                          <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase ${
-                            appt.status === 'Confirmed'
-                              ? 'bg-green-500/10 text-green-500'
-                              : 'bg-yellow-500/10 text-yellow-500'
-                          }`}>
-                            {appt.status || (lang === 'bn' ? 'পেন্ডিং' : 'Pending')}
-                          </span>
-                        </td>
-                        <td className="p-6">
-                          <div className="flex justify-center gap-2">
-                            <button
-                              onClick={() => handleDelete(appt._id)}
-                              className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="4" className="p-10 text-center text-gray-600 text-xs uppercase italic">
-                        {lang === 'bn' ? 'কোনো ডেটা নেই' : 'No data found'}
+                    <tr><td colSpan="4" className="p-10 text-center text-gray-600 animate-pulse uppercase tracking-widest text-xs">{t.loading}</td></tr>
+                  ) : recentAppointments.length > 0 ? recentAppointments.map((appt) => (
+                    <tr key={appt._id} className="hover:bg-white/[0.01] transition-all">
+                      <td className="p-6">
+                        <p className="font-bold text-gray-200">{appt.name}</p>
+                        <p className="text-xs text-gray-500">{appt.phone}</p>
+                      </td>
+                      <td className="p-6">
+                        <span className="text-[#D4AF37] text-xs font-bold uppercase block">{appt.service || "General Treatment"}</span>
+                        <div className="flex items-center gap-3 text-[10px] text-gray-500 uppercase font-medium mt-1">
+                          <span className="flex items-center gap-1"><Calendar size={10} />{appt.appointmentDate || appt.date || t.noDate}</span>
+                          <span className="flex items-center gap-1"><Clock size={10} />{appt.timeSlot || appt.time || t.noTime}</span>
+                        </div>
+                      </td>
+                      <td className="p-6">
+                        <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase ${appt.status === 'Confirmed' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
+                          {appt.status || (lang === 'bn' ? 'পেন্ডিং' : 'Pending')}
+                        </span>
+                      </td>
+                      <td className="p-6">
+                        <div className="flex justify-center">
+                          <button onClick={() => handleDelete(appt._id)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
+                  )) : (
+                    <tr><td colSpan="4" className="p-10 text-center text-gray-600 text-xs uppercase italic">{lang === 'bn' ? 'কোনো ডেটা নেই' : 'No data found'}</td></tr>
                   )}
                 </tbody>
               </table>
