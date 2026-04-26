@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Save, Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Save, Plus, Trash2 } from 'lucide-react';
 
 const API = 'https://st-dental-backend.vercel.app/api/site-content';
 
@@ -50,7 +50,8 @@ const ImageField = ({ label, value, onChange }) => (
   </div>
 );
 
-const ListEditor = ({ label, items = [], onChange }) => {
+// name + icon fields (Services list)
+const ServiceListEditor = ({ label, items = [], onChange }) => {
   const add = () => onChange([...items, { name: '', icon: 'Star' }]);
   const remove = (i) => onChange(items.filter((_, idx) => idx !== i));
   const update = (i, field, val) => {
@@ -58,7 +59,6 @@ const ListEditor = ({ label, items = [], onChange }) => {
     updated[i] = { ...updated[i], [field]: val };
     onChange(updated);
   };
-
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
@@ -70,18 +70,56 @@ const ListEditor = ({ label, items = [], onChange }) => {
       {items.map((item, i) => (
         <div key={i} className="flex gap-2 items-center">
           <input
-            type="text"
-            placeholder="Name"
+            type="text" placeholder="Name"
             value={item.name || ''}
             onChange={(e) => update(i, 'name', e.target.value)}
             className="flex-1 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]"
           />
           <input
-            type="text"
-            placeholder="Icon (e.g. Star)"
+            type="text" placeholder="Icon (e.g. Star)"
             value={item.icon || ''}
             onChange={(e) => update(i, 'icon', e.target.value)}
             className="w-28 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]"
+          />
+          <button onClick={() => remove(i)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">
+            <Trash2 size={13} />
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// icon + text fields (Dental/Skin features)
+const FeatureListEditor = ({ label, items = [], onChange }) => {
+  const add = () => onChange([...items, { icon: 'Star', text: '' }]);
+  const remove = (i) => onChange(items.filter((_, idx) => idx !== i));
+  const update = (i, field, val) => {
+    const updated = [...items];
+    updated[i] = { ...updated[i], [field]: val };
+    onChange(updated);
+  };
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <label className="text-[10px] uppercase font-black tracking-widest text-[#D4AF37]">{label}</label>
+        <button onClick={add} className="flex items-center gap-1 text-[9px] uppercase font-black text-[#D4AF37] border border-[#D4AF37]/30 px-3 py-1 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
+          <Plus size={10} /> Add
+        </button>
+      </div>
+      {items.map((item, i) => (
+        <div key={i} className="flex gap-2 items-center">
+          <input
+            type="text" placeholder="Icon (e.g. Star)"
+            value={item.icon || ''}
+            onChange={(e) => update(i, 'icon', e.target.value)}
+            className="w-28 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]"
+          />
+          <input
+            type="text" placeholder="Text"
+            value={item.text || ''}
+            onChange={(e) => update(i, 'text', e.target.value)}
+            className="flex-1 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]"
           />
           <button onClick={() => remove(i)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">
             <Trash2 size={13} />
@@ -112,10 +150,10 @@ const ServicesEditor = ({ data, set }) => (
       <ImageField label="Skin Care Image" value={data.servicesImage2} onChange={e => set({ ...data, servicesImage2: e.target.value })} />
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <ListEditor label="Dental Services (বাংলা)" items={data.dentalServicesBn} onChange={v => set({ ...data, dentalServicesBn: v })} />
-      <ListEditor label="Dental Services (English)" items={data.dentalServicesEn} onChange={v => set({ ...data, dentalServicesEn: v })} />
-      <ListEditor label="Skin Services (বাংলা)" items={data.skinServicesBn} onChange={v => set({ ...data, skinServicesBn: v })} />
-      <ListEditor label="Skin Services (English)" items={data.skinServicesEn} onChange={v => set({ ...data, skinServicesEn: v })} />
+      <ServiceListEditor label="Dental Services (বাংলা)" items={data.dentalServicesBn} onChange={v => set({ ...data, dentalServicesBn: v })} />
+      <ServiceListEditor label="Dental Services (English)" items={data.dentalServicesEn} onChange={v => set({ ...data, dentalServicesEn: v })} />
+      <ServiceListEditor label="Skin Services (বাংলা)" items={data.skinServicesBn} onChange={v => set({ ...data, skinServicesBn: v })} />
+      <ServiceListEditor label="Skin Services (English)" items={data.skinServicesEn} onChange={v => set({ ...data, skinServicesEn: v })} />
     </div>
   </div>
 );
@@ -130,8 +168,8 @@ const DentalEditor = ({ data, set }) => (
     </div>
     <ImageField label="Dental Image" value={data.dentalImage} onChange={e => set({ ...data, dentalImage: e.target.value })} />
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <ListEditor label="Features (বাংলা)" items={data.dentalFeaturesBn} onChange={v => set({ ...data, dentalFeaturesBn: v })} />
-      <ListEditor label="Features (English)" items={data.dentalFeaturesEn} onChange={v => set({ ...data, dentalFeaturesEn: v })} />
+      <FeatureListEditor label="Features (বাংলা)" items={data.dentalFeaturesBn} onChange={v => set({ ...data, dentalFeaturesBn: v })} />
+      <FeatureListEditor label="Features (English)" items={data.dentalFeaturesEn} onChange={v => set({ ...data, dentalFeaturesEn: v })} />
     </div>
   </div>
 );
@@ -146,8 +184,8 @@ const SkinEditor = ({ data, set }) => (
     </div>
     <ImageField label="Skin Care Image" value={data.skinImage} onChange={e => set({ ...data, skinImage: e.target.value })} />
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <ListEditor label="Features (বাংলা)" items={data.skinFeaturesBn} onChange={v => set({ ...data, skinFeaturesBn: v })} />
-      <ListEditor label="Features (English)" items={data.skinFeaturesEn} onChange={v => set({ ...data, skinFeaturesEn: v })} />
+      <FeatureListEditor label="Features (বাংলা)" items={data.skinFeaturesBn} onChange={v => set({ ...data, skinFeaturesBn: v })} />
+      <FeatureListEditor label="Features (English)" items={data.skinFeaturesEn} onChange={v => set({ ...data, skinFeaturesEn: v })} />
     </div>
   </div>
 );
@@ -190,6 +228,7 @@ const ManageSiteContent = ({ lang }) => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchSection(activeSection);
@@ -197,10 +236,12 @@ const ManageSiteContent = ({ lang }) => {
 
   const fetchSection = async (sec) => {
     setLoading(true);
+    setError('');
     try {
       const res = await axios.get(`${API}/${sec}`);
       setData(res.data);
     } catch (err) {
+      setError('ডেটা লোড হয়নি। আবার চেষ্টা করুন।');
       console.error(err);
     }
     setLoading(false);
@@ -208,18 +249,30 @@ const ManageSiteContent = ({ lang }) => {
 
   const handleSave = async () => {
     setSaving(true);
+    setError('');
     try {
-      await axios.put(`${API}/${activeSection}`, data);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      // _id, __v, createdAt, updatedAt, section বাদ দিয়ে clean data পাঠানো
+      const { _id, __v, createdAt, updatedAt, section, ...cleanData } = data;
+
+      const res = await axios.put(`${API}/${activeSection}`, cleanData);
+
+      if (res.data && res.data.success) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+        // সেভ করার পর fresh data আনো
+        fetchSection(activeSection);
+      } else {
+        setError('সেভ হয়নি। আবার চেষ্টা করুন।');
+      }
     } catch (err) {
-      alert('Save failed!');
+      console.error(err);
+      setError('সেভ failed! Backend error।');
     }
     setSaving(false);
   };
 
   const renderEditor = () => {
-    if (loading) return <div className="text-gray-500 text-xs uppercase tracking-widest py-10 text-center">লোড হচ্ছে...</div>;
+    if (loading) return <div className="text-gray-500 text-xs uppercase tracking-widest py-10 text-center animate-pulse">লোড হচ্ছে...</div>;
     switch (activeSection) {
       case 'hero':        return <HeroEditor data={data} set={setData} />;
       case 'services':    return <ServicesEditor data={data} set={setData} />;
@@ -233,6 +286,7 @@ const ManageSiteContent = ({ lang }) => {
 
   return (
     <div className="w-full space-y-6 pb-10">
+      {/* Section tabs */}
       <div className="flex flex-wrap gap-2">
         {sections.map(s => (
           <button
@@ -256,19 +310,31 @@ const ManageSiteContent = ({ lang }) => {
           </h3>
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || loading}
             className={`flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-black uppercase transition-all ${
-              saved ? 'bg-green-500 text-white' : 'bg-[#D4AF37] text-black hover:bg-white'
+              saved
+                ? 'bg-green-500 text-white'
+                : saving
+                  ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                  : 'bg-[#D4AF37] text-black hover:bg-white'
             }`}
           >
             <Save size={13} />
             {saving ? 'সেভ হচ্ছে...' : saved ? '✓ সেভ হয়েছে!' : 'সেভ করুন'}
           </button>
         </div>
+
+        {/* Error message */}
+        {error && (
+          <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-xl font-bold uppercase tracking-widest">
+            ⚠ {error}
+          </div>
+        )}
+
         {renderEditor()}
       </div>
     </div>
   );
 };
 
-export default ManageSiteContent; 
+export default ManageSiteContent;
