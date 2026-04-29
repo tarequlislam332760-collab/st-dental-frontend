@@ -16,6 +16,11 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // localStorage থেকে admin info নেওয়া
+  const adminName     = localStorage.getItem('adminName')     || 'Admin';
+  const adminInitials = localStorage.getItem('adminInitials') || 'AD';
+  const adminRole     = localStorage.getItem('adminRole')     || 'Admin';
+
   const API_URL = "https://st-dental-backend.vercel.app/api";
 
   const fetchRecentData = async () => {
@@ -36,6 +41,9 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminName');
+    localStorage.removeItem('adminInitials');
+    localStorage.removeItem('adminRole');
     window.location.href = '/st-admin-secure/login';
   };
 
@@ -50,7 +58,6 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
       noDate: "No Date", noTime: "No Time",
       table: { name: "Patient", info: "Service & Time", status: "Status", action: "Action" },
       deleteConfirm: "Are you sure you want to delete?",
-      superAdmin: "Super Admin",
       blogActions: { add: "Add New Blog", edit: "Edit Blog", save: "Save Blog", delete: "Delete" }
     },
     bn: {
@@ -61,7 +68,6 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
       noDate: "তারিখ নেই", noTime: "সময় নেই",
       table: { name: "রোগী", info: "সেবা ও সময়", status: "অবস্থা", action: "অ্যাকশন" },
       deleteConfirm: "আপনি কি এটি ডিলিট করতে চান?",
-      superAdmin: "সুপার এডমিন",
       blogActions: { add: "নতুন ব্লগ লিখুন", edit: "এডিট করুন", save: "সেভ করুন", delete: "ডিলিট" }
     }
   }[lang];
@@ -78,11 +84,11 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   };
 
   const navItems = [
-    { id: 'dashboard',    label: t.dash,  icon: LayoutDashboard },
-    { id: 'appointments', label: t.appt,  icon: Users },
-    { id: 'reviews',      label: t.rev,   icon: MessageSquare },
-    { id: 'blogs',        label: t.blog,  icon: FileText },
-    { id: 'sitecontent',  label: t.site,  icon: Settings },
+    { id: 'dashboard',   label: t.dash, icon: LayoutDashboard },
+    { id: 'appointments',label: t.appt, icon: Users },
+    { id: 'reviews',     label: t.rev,  icon: MessageSquare },
+    { id: 'blogs',       label: t.blog, icon: FileText },
+    { id: 'sitecontent', label: t.site, icon: Settings },
   ];
 
   return (
@@ -135,16 +141,18 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
           <div>
             <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight">
-              {t.welcome} <span className="text-[#D4AF37]">Tareq</span>
+              {t.welcome} <span className="text-[#D4AF37]">{adminName.split(' ')[0]}</span>
             </h2>
             <p className="text-gray-500 text-xs mt-1 uppercase tracking-widest">{t.subtitle}</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold">Tareq Islam</p>
-              <p className="text-[10px] text-[#D4AF37] uppercase font-bold tracking-tighter">{t.superAdmin}</p>
+              <p className="text-sm font-bold">{adminName}</p>
+              <p className="text-[10px] text-[#D4AF37] uppercase font-bold tracking-tighter">{adminRole}</p>
             </div>
-            <div className="w-12 h-12 bg-[#111111] border border-[#D4AF37]/20 rounded-2xl flex items-center justify-center text-[#D4AF37] font-black text-xl shadow-xl">TI</div>
+            <div className="w-12 h-12 bg-[#111111] border border-[#D4AF37]/20 rounded-2xl flex items-center justify-center text-[#D4AF37] font-black text-sm shadow-xl">
+              {adminInitials}
+            </div>
           </div>
         </header>
 
