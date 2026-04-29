@@ -14,16 +14,39 @@ const sections = [
   { key: 'contactinfo', label: 'Contact Info' },
 ];
 
-// সবচেয়ে common icon গুলো
-const ICON_OPTIONS = [
-  'Star', 'Heart', 'Smile', 'Zap', 'Shield', 'ShieldCheck',
-  'Activity', 'Sparkle', 'Sparkles', 'Sun', 'Moon', 'Droplets',
-  'UserCircle', 'UserCheck', 'Target', 'CheckCircle', 'Award',
-  'Stethoscope', 'Pill', 'Scissors', 'Eye', 'Ear', 'Bone',
-  'Syringe', 'Thermometer', 'Brain', 'Hand', 'Microscope',
-  'Clock', 'Calendar', 'MapPin', 'Phone', 'Mail',
-  'Camera', 'Image', 'Leaf', 'Flower', 'Flower2',
+const ICON_GROUPS = [
+  {
+    group: '🦷 Dental Care',
+    icons: [
+      'Smile', 'Zap', 'ShieldCheck', 'Shield', 'Activity',
+      'Stethoscope', 'Syringe', 'Thermometer', 'Microscope',
+      'Scissors', 'Pill', 'HeartPulse', 'CrosshairIcon',
+      'FlaskConical', 'Radiation', 'Bone', 'Brain',
+      'Star', 'Award', 'CheckCircle', 'BadgeCheck',
+    ],
+  },
+  {
+    group: '✨ Skin & Aesthetic',
+    icons: [
+      'Sparkles', 'Sparkle', 'Sun', 'Moon', 'Droplets',
+      'Leaf', 'Flower', 'Flower2', 'Wind', 'Feather',
+      'Heart', 'HeartHandshake', 'Eye', 'UserCircle',
+      'UserCheck', 'HandHeart', 'Gem', 'Crown',
+      'Wand', 'Wand2', 'Palette', 'PaintBucket',
+    ],
+  },
+  {
+    group: '🏥 General',
+    icons: [
+      'Clock', 'Calendar', 'MapPin', 'Phone', 'Mail',
+      'Target', 'Users', 'User', 'Building', 'Home',
+      'Camera', 'Image', 'Star', 'ThumbsUp', 'HandshakeIcon',
+      'Lightbulb', 'Rocket', 'Globe', 'Lock', 'Key',
+    ],
+  },
 ];
+
+const ALL_ICONS = ICON_GROUPS.flatMap(g => g.icons);
 
 const SafeIcon = ({ name, size = 18, className = "" }) => {
   const IconComponent = Lucide[name] || Lucide.HelpCircle;
@@ -32,6 +55,8 @@ const SafeIcon = ({ name, size = 18, className = "" }) => {
 
 const IconPicker = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
+  const [activeGroup, setActiveGroup] = useState(0);
+
   return (
     <div className="relative">
       <button
@@ -40,22 +65,44 @@ const IconPicker = ({ value, onChange }) => {
         className="flex items-center gap-2 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37] w-full hover:border-[#D4AF37]/50 transition-all"
       >
         <SafeIcon name={value || 'Star'} size={16} className="text-[#D4AF37]" />
-        <span className="flex-1 text-left">{value || 'Star'}</span>
+        <span className="flex-1 text-left text-xs">{value || 'Star'}</span>
         <Lucide.ChevronDown size={14} className="text-gray-500" />
       </button>
+
       {open && (
-        <div className="absolute z-50 top-full left-0 mt-1 w-64 bg-[#1a1a1a] border border-white/10 rounded-xl p-2 grid grid-cols-5 gap-1 max-h-48 overflow-y-auto shadow-2xl">
-          {ICON_OPTIONS.map(icon => (
-            <button
-              key={icon}
-              type="button"
-              onClick={() => { onChange(icon); setOpen(false); }}
-              title={icon}
-              className={`flex items-center justify-center p-2 rounded-lg hover:bg-[#D4AF37]/20 transition-all ${value === icon ? 'bg-[#D4AF37]/30 border border-[#D4AF37]/50' : ''}`}
-            >
-              <SafeIcon name={icon} size={18} className={value === icon ? 'text-[#D4AF37]' : 'text-gray-400'} />
-            </button>
-          ))}
+        <div className="absolute z-50 top-full left-0 mt-1 w-72 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+          {/* Group Tabs */}
+          <div className="flex border-b border-white/10">
+            {ICON_GROUPS.map((g, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setActiveGroup(i)}
+                className={`flex-1 py-2 text-[9px] font-black uppercase transition-all ${
+                  activeGroup === i ? 'bg-[#D4AF37]/20 text-[#D4AF37]' : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                {g.group}
+              </button>
+            ))}
+          </div>
+
+          {/* Icons Grid */}
+          <div className="p-2 grid grid-cols-6 gap-1 max-h-44 overflow-y-auto">
+            {ICON_GROUPS[activeGroup].icons.map(icon => (
+              <button
+                key={icon}
+                type="button"
+                onClick={() => { onChange(icon); setOpen(false); }}
+                title={icon}
+                className={`flex items-center justify-center p-2 rounded-lg hover:bg-[#D4AF37]/20 transition-all ${
+                  value === icon ? 'bg-[#D4AF37]/30 border border-[#D4AF37]/50' : ''
+                }`}
+              >
+                <SafeIcon name={icon} size={18} className={value === icon ? 'text-[#D4AF37]' : 'text-gray-400'} />
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -102,11 +149,15 @@ const ListEditor = ({ label, items = [], onChange }) => {
         </button>
       </div>
       {items.map((item, i) => (
-        <div key={i} className="flex gap-2 items-center">
-          <input type="text" placeholder="Service নাম" value={item.name || ''}
+        <div key={i} className="flex gap-2 items-center bg-white/[0.03] p-2 rounded-xl">
+          <input
+            type="text"
+            placeholder="Service নাম লিখুন"
+            value={item.name || ''}
             onChange={(e) => update(i, 'name', e.target.value)}
-            className="flex-1 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]" />
-          <div className="w-36">
+            className="flex-1 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]"
+          />
+          <div className="w-40 shrink-0">
             <IconPicker value={item.icon} onChange={(val) => update(i, 'icon', val)} />
           </div>
           <button onClick={() => remove(i)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all shrink-0">
@@ -114,6 +165,9 @@ const ListEditor = ({ label, items = [], onChange }) => {
           </button>
         </div>
       ))}
+      {items.length === 0 && (
+        <p className="text-gray-600 text-[10px] uppercase italic text-center py-2">কোনো item নেই — Add বাটনে click করুন</p>
+      )}
     </div>
   );
 };
@@ -138,10 +192,10 @@ const ServicesEditor = ({ data, set }) => (
       <ImageField label="Skin Care Image" value={data.servicesImage2} onChange={e => set({ ...data, servicesImage2: e.target.value })} />
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <ListEditor label="Dental Services (বাংলা)" items={data.dentalServicesBn} onChange={v => set({ ...data, dentalServicesBn: v })} />
-      <ListEditor label="Dental Services (English)" items={data.dentalServicesEn} onChange={v => set({ ...data, dentalServicesEn: v })} />
-      <ListEditor label="Skin Services (বাংলা)" items={data.skinServicesBn} onChange={v => set({ ...data, skinServicesBn: v })} />
-      <ListEditor label="Skin Services (English)" items={data.skinServicesEn} onChange={v => set({ ...data, skinServicesEn: v })} />
+      <ListEditor label="🦷 Dental Services (বাংলা)" items={data.dentalServicesBn || []} onChange={v => set({ ...data, dentalServicesBn: v })} />
+      <ListEditor label="🦷 Dental Services (English)" items={data.dentalServicesEn || []} onChange={v => set({ ...data, dentalServicesEn: v })} />
+      <ListEditor label="✨ Skin Services (বাংলা)" items={data.skinServicesBn || []} onChange={v => set({ ...data, skinServicesBn: v })} />
+      <ListEditor label="✨ Skin Services (English)" items={data.skinServicesEn || []} onChange={v => set({ ...data, skinServicesEn: v })} />
     </div>
   </div>
 );
@@ -156,8 +210,8 @@ const DentalEditor = ({ data, set }) => (
     </div>
     <ImageField label="Dental Image" value={data.dentalImage} onChange={e => set({ ...data, dentalImage: e.target.value })} />
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <ListEditor label="Features (বাংলা)" items={data.dentalFeaturesBn} onChange={v => set({ ...data, dentalFeaturesBn: v })} />
-      <ListEditor label="Features (English)" items={data.dentalFeaturesEn} onChange={v => set({ ...data, dentalFeaturesEn: v })} />
+      <ListEditor label="🦷 Features (বাংলা)" items={data.dentalFeaturesBn || []} onChange={v => set({ ...data, dentalFeaturesBn: v })} />
+      <ListEditor label="🦷 Features (English)" items={data.dentalFeaturesEn || []} onChange={v => set({ ...data, dentalFeaturesEn: v })} />
     </div>
   </div>
 );
@@ -172,8 +226,8 @@ const SkinEditor = ({ data, set }) => (
     </div>
     <ImageField label="Skin Care Image" value={data.skinImage} onChange={e => set({ ...data, skinImage: e.target.value })} />
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <ListEditor label="Features (বাংলা)" items={data.skinFeaturesBn} onChange={v => set({ ...data, skinFeaturesBn: v })} />
-      <ListEditor label="Features (English)" items={data.skinFeaturesEn} onChange={v => set({ ...data, skinFeaturesEn: v })} />
+      <ListEditor label="✨ Features (বাংলা)" items={data.skinFeaturesBn || []} onChange={v => set({ ...data, skinFeaturesBn: v })} />
+      <ListEditor label="✨ Features (English)" items={data.skinFeaturesEn || []} onChange={v => set({ ...data, skinFeaturesEn: v })} />
     </div>
   </div>
 );
@@ -190,7 +244,7 @@ const AboutEditor = ({ data, set }) => (
         <div key={n} className="flex flex-col gap-2 bg-white/5 p-4 rounded-2xl">
           <p className="text-[10px] text-[#D4AF37] font-black uppercase">Stat {n}</p>
           <InputField label="Label" value={data[`aboutStat${n}Label`]} onChange={e => set({ ...data, [`aboutStat${n}Label`]: e.target.value })} />
-          <InputField label="Value" value={data[`aboutStat${n}Value`]} onChange={e => set({ ...data, [`aboutStat${n}Value`]: e.target.value })} />
+          <InputField label="Value (যেমন: 10+)" value={data[`aboutStat${n}Value`]} onChange={e => set({ ...data, [`aboutStat${n}Value`]: e.target.value })} />
         </div>
       ))}
     </div>
@@ -200,7 +254,7 @@ const AboutEditor = ({ data, set }) => (
 const ContactInfoEditor = ({ data, set }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
     <InputField label="Phone" value={data.phone} onChange={e => set({ ...data, phone: e.target.value })} />
-    <InputField label="WhatsApp" value={data.whatsapp} onChange={e => set({ ...data, whatsapp: e.target.value })} />
+    <InputField label="WhatsApp Number" value={data.whatsapp} onChange={e => set({ ...data, whatsapp: e.target.value })} />
     <InputField label="Address" value={data.address} onChange={e => set({ ...data, address: e.target.value })} />
     <InputField label="Google Map Link" value={data.mapLink} onChange={e => set({ ...data, mapLink: e.target.value })} />
   </div>
@@ -241,7 +295,11 @@ const ManageSiteContent = ({ lang }) => {
   };
 
   const renderEditor = () => {
-    if (loading) return <div className="text-gray-500 text-xs uppercase tracking-widest py-10 text-center">লোড হচ্ছে...</div>;
+    if (loading) return (
+      <div className="text-gray-500 text-xs uppercase tracking-widest py-10 text-center animate-pulse">
+        লোড হচ্ছে...
+      </div>
+    );
     switch (activeSection) {
       case 'hero':        return <HeroEditor data={data} set={setData} />;
       case 'services':    return <ServicesEditor data={data} set={setData} />;
@@ -259,7 +317,9 @@ const ManageSiteContent = ({ lang }) => {
         {sections.map(s => (
           <button key={s.key} onClick={() => setActiveSection(s.key)}
             className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-              activeSection === s.key ? 'bg-[#D4AF37] text-black' : 'bg-white/5 text-gray-400 hover:text-[#D4AF37] border border-white/10'
+              activeSection === s.key
+                ? 'bg-[#D4AF37] text-black'
+                : 'bg-white/5 text-gray-400 hover:text-[#D4AF37] border border-white/10'
             }`}>
             {s.label}
           </button>
