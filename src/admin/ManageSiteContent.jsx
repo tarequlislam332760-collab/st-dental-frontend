@@ -48,34 +48,56 @@ const SafeIcon = ({ name, size = 18, className = "" }) => {
 const IconPicker = ({ value, onChange, iconSet = GENERAL_ICONS }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="relative">
+    <>
       <button type="button" onClick={() => setOpen(!open)}
         className="flex items-center gap-2 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 w-full hover:border-[#D4AF37]/50 transition-all">
         <SafeIcon name={value || 'Star'} size={15} className="text-[#D4AF37] shrink-0" />
         <span className="flex-1 text-left text-xs truncate">{value || 'Star'}</span>
         <Lucide.ChevronDown size={13} className="text-gray-500 shrink-0" />
       </button>
+
       {open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute z-50 top-full left-0 mt-1 w-52 bg-[#1a1a1a] border border-white/10 rounded-2xl p-3 shadow-2xl">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest">বেছে নিন</span>
-              <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-white"><X size={12} /></button>
-            </div>
-            <div className="grid grid-cols-5 gap-1 max-h-44 overflow-y-auto">
-              {iconSet.map(icon => (
-                <button key={icon} type="button" onClick={() => { onChange(icon); setOpen(false); }} title={icon}
-                  className={`flex flex-col items-center p-2 rounded-xl hover:bg-[#D4AF37]/20 transition-all ${value === icon ? 'bg-[#D4AF37]/30 border border-[#D4AF37]/50' : 'border border-transparent'}`}>
-                  <SafeIcon name={icon} size={17} className={value === icon ? 'text-[#D4AF37]' : 'text-gray-400'} />
-                  <span className="text-[7px] text-gray-500 truncate w-full text-center mt-0.5 leading-none">{icon}</span>
+          {/* full screen backdrop */}
+          <div className="fixed inset-0 z-[100] bg-black/60 flex items-end sm:items-center justify-center p-4"
+            onClick={() => setOpen(false)}>
+            <div className="bg-[#1a1a1a] border border-white/10 rounded-3xl p-4 w-full max-w-sm shadow-2xl"
+              onClick={e => e.stopPropagation()}>
+              {/* header */}
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs text-[#D4AF37] uppercase font-black tracking-widest">Icon বেছে নিন</span>
+                <button onClick={() => setOpen(false)}
+                  className="p-1.5 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all">
+                  <X size={14} />
                 </button>
-              ))}
+              </div>
+              {/* selected preview */}
+              <div className="flex items-center gap-3 bg-[#D4AF37]/10 border border-[#D4AF37]/20 rounded-2xl px-4 py-3 mb-4">
+                <SafeIcon name={value || 'Star'} size={22} className="text-[#D4AF37]" />
+                <span className="text-white font-bold text-sm">{value || 'Star'}</span>
+              </div>
+              {/* icon grid */}
+              <div className="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto">
+                {iconSet.map(icon => (
+                  <button key={icon} type="button"
+                    onClick={() => { onChange(icon); setOpen(false); }}
+                    className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all gap-1.5 ${
+                      value === icon
+                        ? 'bg-[#D4AF37] border-2 border-[#D4AF37]'
+                        : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                    }`}>
+                    <SafeIcon name={icon} size={22} className={value === icon ? 'text-black' : 'text-gray-300'} />
+                    <span className={`text-[9px] truncate w-full text-center leading-none font-bold ${value === icon ? 'text-black' : 'text-gray-500'}`}>
+                      {icon}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </>
       )}
-    </div>
+    </>
   );
 };
 
