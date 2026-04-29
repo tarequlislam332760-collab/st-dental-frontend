@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Save, Plus, Trash2 } from 'lucide-react';
+import { Save, Plus, Trash2, X } from 'lucide-react';
 import * as Lucide from 'lucide-react';
 
 const API = 'https://st-dental-backend.vercel.app/api/site-content';
@@ -14,109 +14,79 @@ const sections = [
   { key: 'contactinfo', label: 'Contact Info' },
 ];
 
-const ICON_GROUPS = [
-  {
-    group: '🦷 Dental Care',
-    icons: [
-      'Smile', 'Zap', 'ShieldCheck', 'Shield', 'Activity',
-      'Stethoscope', 'Syringe', 'Thermometer', 'Microscope',
-      'Scissors', 'Pill', 'HeartPulse', 'CrosshairIcon',
-      'FlaskConical', 'Radiation', 'Bone', 'Brain',
-      'Star', 'Award', 'CheckCircle', 'BadgeCheck',
-    ],
-  },
-  {
-    group: '✨ Skin & Aesthetic',
-    icons: [
-      'Sparkles', 'Sparkle', 'Sun', 'Moon', 'Droplets',
-      'Leaf', 'Flower', 'Flower2', 'Wind', 'Feather',
-      'Heart', 'HeartHandshake', 'Eye', 'UserCircle',
-      'UserCheck', 'HandHeart', 'Gem', 'Crown',
-      'Wand', 'Wand2', 'Palette', 'PaintBucket',
-    ],
-  },
-  {
-    group: '🏥 General',
-    icons: [
-      'Clock', 'Calendar', 'MapPin', 'Phone', 'Mail',
-      'Target', 'Users', 'User', 'Building', 'Home',
-      'Camera', 'Image', 'Star', 'ThumbsUp', 'HandshakeIcon',
-      'Lightbulb', 'Rocket', 'Globe', 'Lock', 'Key',
-    ],
-  },
+// ডেন্টাল সম্পর্কিত ৩০টি icon
+const DENTAL_ICONS = [
+  'Smile', 'SmilePlus', 'Stethoscope', 'Activity', 'ShieldCheck', 'Shield',
+  'Zap', 'Star', 'Award', 'CheckCircle', 'Check', 'CircleCheck',
+  'Pill', 'Syringe', 'Thermometer', 'Microscope', 'ClipboardPlus', 'Clipboard',
+  'HeartPulse', 'Heart', 'Brain', 'Bone', 'Scissors', 'Wrench',
+  'Sparkles', 'Sparkle', 'BadgeCheck', 'Medal', 'Trophy', 'Crown',
 ];
 
-const ALL_ICONS = ICON_GROUPS.flatMap(g => g.icons);
+// স্কিন কেয়ার সম্পর্কিত ৩০টি icon
+const SKIN_ICONS = [
+  'Sun', 'Sunset', 'Sunrise', 'Moon', 'Droplets', 'Droplet',
+  'Flower', 'Flower2', 'Leaf', 'Sprout', 'Gem', 'Diamond',
+  'Sparkles', 'Sparkle', 'Star', 'Wand', 'Wand2', 'Palette',
+  'UserCheck', 'UserCircle', 'Eye', 'EyeOff', 'Glasses', 'Hand',
+  'Heart', 'HeartHandshake', 'Smile', 'SmilePlus', 'Baby', 'Crown',
+];
+
+const GENERAL_ICONS = [
+  'Star', 'Heart', 'Smile', 'Zap', 'Shield', 'ShieldCheck',
+  'Activity', 'Sparkles', 'Sun', 'Droplets', 'UserCircle', 'UserCheck',
+  'Target', 'CheckCircle', 'Award', 'Stethoscope', 'Clock', 'Calendar',
+  'MapPin', 'Phone', 'Mail', 'Camera', 'Leaf', 'Flower',
+  'Crown', 'Trophy', 'Medal', 'BadgeCheck', 'Gem', 'HeartPulse',
+];
 
 const SafeIcon = ({ name, size = 18, className = "" }) => {
   const IconComponent = Lucide[name] || Lucide.HelpCircle;
   return <IconComponent size={size} className={className} />;
 };
 
-const IconPicker = ({ value, onChange }) => {
+const IconPicker = ({ value, onChange, iconSet = GENERAL_ICONS }) => {
   const [open, setOpen] = useState(false);
-  const [activeGroup, setActiveGroup] = useState(0);
-
   return (
     <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37] w-full hover:border-[#D4AF37]/50 transition-all"
-      >
-        <SafeIcon name={value || 'Star'} size={16} className="text-[#D4AF37]" />
-        <span className="flex-1 text-left text-xs">{value || 'Star'}</span>
-        <Lucide.ChevronDown size={14} className="text-gray-500" />
+      <button type="button" onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 w-full hover:border-[#D4AF37]/50 transition-all">
+        <SafeIcon name={value || 'Star'} size={15} className="text-[#D4AF37] shrink-0" />
+        <span className="flex-1 text-left text-xs truncate">{value || 'Star'}</span>
+        <Lucide.ChevronDown size={13} className="text-gray-500 shrink-0" />
       </button>
-
       {open && (
-        <div className="absolute z-50 top-full left-0 mt-1 w-72 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
-          {/* Group Tabs */}
-          <div className="flex border-b border-white/10">
-            {ICON_GROUPS.map((g, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setActiveGroup(i)}
-                className={`flex-1 py-2 text-[9px] font-black uppercase transition-all ${
-                  activeGroup === i ? 'bg-[#D4AF37]/20 text-[#D4AF37]' : 'text-gray-500 hover:text-gray-300'
-                }`}
-              >
-                {g.group}
-              </button>
-            ))}
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute z-50 top-full left-0 mt-1 w-52 bg-[#1a1a1a] border border-white/10 rounded-2xl p-3 shadow-2xl">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] text-gray-500 uppercase font-black tracking-widest">বেছে নিন</span>
+              <button onClick={() => setOpen(false)} className="text-gray-500 hover:text-white"><X size={12} /></button>
+            </div>
+            <div className="grid grid-cols-5 gap-1 max-h-44 overflow-y-auto">
+              {iconSet.map(icon => (
+                <button key={icon} type="button" onClick={() => { onChange(icon); setOpen(false); }} title={icon}
+                  className={`flex flex-col items-center p-2 rounded-xl hover:bg-[#D4AF37]/20 transition-all ${value === icon ? 'bg-[#D4AF37]/30 border border-[#D4AF37]/50' : 'border border-transparent'}`}>
+                  <SafeIcon name={icon} size={17} className={value === icon ? 'text-[#D4AF37]' : 'text-gray-400'} />
+                  <span className="text-[7px] text-gray-500 truncate w-full text-center mt-0.5 leading-none">{icon}</span>
+                </button>
+              ))}
+            </div>
           </div>
-
-          {/* Icons Grid */}
-          <div className="p-2 grid grid-cols-6 gap-1 max-h-44 overflow-y-auto">
-            {ICON_GROUPS[activeGroup].icons.map(icon => (
-              <button
-                key={icon}
-                type="button"
-                onClick={() => { onChange(icon); setOpen(false); }}
-                title={icon}
-                className={`flex items-center justify-center p-2 rounded-lg hover:bg-[#D4AF37]/20 transition-all ${
-                  value === icon ? 'bg-[#D4AF37]/30 border border-[#D4AF37]/50' : ''
-                }`}
-              >
-                <SafeIcon name={icon} size={18} className={value === icon ? 'text-[#D4AF37]' : 'text-gray-400'} />
-              </button>
-            ))}
-          </div>
-        </div>
+        </>
       )}
     </div>
   );
 };
 
-const InputField = ({ label, value, onChange, textarea = false }) => (
+const InputField = ({ label, value, onChange, textarea = false, placeholder = '' }) => (
   <div className="flex flex-col gap-1">
     <label className="text-[10px] uppercase font-black tracking-widest text-[#D4AF37]">{label}</label>
     {textarea ? (
-      <textarea value={value || ''} onChange={onChange} rows={3}
+      <textarea value={value || ''} onChange={onChange} rows={3} placeholder={placeholder}
         className="bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37] resize-none" />
     ) : (
-      <input type="text" value={value || ''} onChange={onChange}
+      <input type="text" value={value || ''} onChange={onChange} placeholder={placeholder}
         className="bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]" />
     )}
   </div>
@@ -127,124 +97,144 @@ const ImageField = ({ label, value, onChange }) => (
     <label className="text-[10px] uppercase font-black tracking-widest text-[#D4AF37]">{label}</label>
     <input type="text" placeholder="Image URL paste করুন" value={value || ''} onChange={onChange}
       className="bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]" />
-    {value && <img src={value} alt="preview" className="w-full max-h-40 object-cover rounded-xl border border-white/10 mt-1" />}
+    {value && <img src={value} alt="preview" className="w-full max-h-32 object-cover rounded-xl border border-white/10 mt-1" onError={e => e.target.style.display='none'} />}
   </div>
 );
 
-const ListEditor = ({ label, items = [], onChange }) => {
-  const add = () => onChange([...items, { name: '', icon: 'Star' }]);
+const ServiceListEditor = ({ label, items = [], onChange, iconSet = GENERAL_ICONS }) => {
+  const add = () => onChange([...items, { name: '', icon: iconSet[0] }]);
   const remove = (i) => onChange(items.filter((_, idx) => idx !== i));
-  const update = (i, field, val) => {
-    const updated = [...items];
-    updated[i] = { ...updated[i], [field]: val };
-    onChange(updated);
-  };
-
+  const update = (i, field, val) => { const u = [...items]; u[i] = { ...u[i], [field]: val }; onChange(u); };
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <label className="text-[10px] uppercase font-black tracking-widest text-[#D4AF37]">{label}</label>
-        <button onClick={add} className="flex items-center gap-1 text-[9px] uppercase font-black text-[#D4AF37] border border-[#D4AF37]/30 px-3 py-1 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
+        <button onClick={add} className="flex items-center gap-1 text-[9px] uppercase font-black text-[#D4AF37] border border-[#D4AF37]/30 px-3 py-1.5 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
           <Plus size={10} /> Add
         </button>
       </div>
+      {items.length === 0 && <p className="text-gray-600 text-[10px] text-center py-3 border border-dashed border-white/10 rounded-xl uppercase">ADD বাটনে click করুন</p>}
       {items.map((item, i) => (
-        <div key={i} className="flex gap-2 items-center bg-white/[0.03] p-2 rounded-xl">
-          <input
-            type="text"
-            placeholder="Service নাম লিখুন"
-            value={item.name || ''}
-            onChange={(e) => update(i, 'name', e.target.value)}
-            className="flex-1 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]"
-          />
-          <div className="w-40 shrink-0">
-            <IconPicker value={item.icon} onChange={(val) => update(i, 'icon', val)} />
+        <div key={i} className="flex gap-2 items-center">
+          <input type="text" placeholder="নাম লিখুন" value={item.name || ''} onChange={e => update(i, 'name', e.target.value)}
+            className="flex-1 min-w-0 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]" />
+          <div className="w-28 shrink-0">
+            <IconPicker value={item.icon} onChange={val => update(i, 'icon', val)} iconSet={iconSet} />
           </div>
-          <button onClick={() => remove(i)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all shrink-0">
+          <button onClick={() => remove(i)} className="p-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shrink-0">
             <Trash2 size={13} />
           </button>
         </div>
       ))}
-      {items.length === 0 && (
-        <p className="text-gray-600 text-[10px] uppercase italic text-center py-2">কোনো item নেই — Add বাটনে click করুন</p>
-      )}
     </div>
   );
 };
 
-// ---- Section Editors ----
+const FeatureListEditor = ({ label, items = [], onChange, iconSet = GENERAL_ICONS }) => {
+  const add = () => onChange([...items, { icon: iconSet[0], text: '' }]);
+  const remove = (i) => onChange(items.filter((_, idx) => idx !== i));
+  const update = (i, field, val) => { const u = [...items]; u[i] = { ...u[i], [field]: val }; onChange(u); };
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <label className="text-[10px] uppercase font-black tracking-widest text-[#D4AF37]">{label}</label>
+        <button onClick={add} className="flex items-center gap-1 text-[9px] uppercase font-black text-[#D4AF37] border border-[#D4AF37]/30 px-3 py-1.5 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all">
+          <Plus size={10} /> Add
+        </button>
+      </div>
+      {items.length === 0 && <p className="text-gray-600 text-[10px] text-center py-3 border border-dashed border-white/10 rounded-xl uppercase">ADD বাটনে click করুন</p>}
+      {items.map((item, i) => (
+        <div key={i} className="flex gap-2 items-center">
+          <div className="w-28 shrink-0">
+            <IconPicker value={item.icon} onChange={val => update(i, 'icon', val)} iconSet={iconSet} />
+          </div>
+          <input type="text" placeholder="Text লিখুন" value={item.text || ''} onChange={e => update(i, 'text', e.target.value)}
+            className="flex-1 min-w-0 bg-black/50 border border-white/10 text-white text-sm rounded-xl px-3 py-2 outline-none focus:border-[#D4AF37]" />
+          <button onClick={() => remove(i)} className="p-2 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shrink-0">
+            <Trash2 size={13} />
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+};
 
+// ---- Editors ----
 const HeroEditor = ({ data, set }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
     <InputField label="Title (বাংলা)" value={data.heroTitleBn} onChange={e => set({ ...data, heroTitleBn: e.target.value })} />
     <InputField label="Title (English)" value={data.heroTitleEn} onChange={e => set({ ...data, heroTitleEn: e.target.value })} />
+    <InputField label="Sub Title (বাংলা)" value={data.heroSubBn} onChange={e => set({ ...data, heroSubBn: e.target.value })} />
+    <InputField label="Sub Title (English)" value={data.heroSubEn} onChange={e => set({ ...data, heroSubEn: e.target.value })} />
     <InputField label="Description (বাংলা)" value={data.heroDescBn} onChange={e => set({ ...data, heroDescBn: e.target.value })} textarea />
     <InputField label="Description (English)" value={data.heroDescEn} onChange={e => set({ ...data, heroDescEn: e.target.value })} textarea />
-    <ImageField label="Hero Image 1" value={data.heroImage1} onChange={e => set({ ...data, heroImage1: e.target.value })} />
-    <ImageField label="Hero Image 2" value={data.heroImage2} onChange={e => set({ ...data, heroImage2: e.target.value })} />
+    <ImageField label="Hero Image 1 (Dental)" value={data.heroImage1} onChange={e => set({ ...data, heroImage1: e.target.value })} />
+    <ImageField label="Hero Image 2 (Skin)" value={data.heroImage2} onChange={e => set({ ...data, heroImage2: e.target.value })} />
   </div>
 );
 
 const ServicesEditor = ({ data, set }) => (
   <div className="flex flex-col gap-6">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <ImageField label="Dental Image" value={data.servicesImage1} onChange={e => set({ ...data, servicesImage1: e.target.value })} />
       <ImageField label="Skin Care Image" value={data.servicesImage2} onChange={e => set({ ...data, servicesImage2: e.target.value })} />
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <ListEditor label="🦷 Dental Services (বাংলা)" items={data.dentalServicesBn || []} onChange={v => set({ ...data, dentalServicesBn: v })} />
-      <ListEditor label="🦷 Dental Services (English)" items={data.dentalServicesEn || []} onChange={v => set({ ...data, dentalServicesEn: v })} />
-      <ListEditor label="✨ Skin Services (বাংলা)" items={data.skinServicesBn || []} onChange={v => set({ ...data, skinServicesBn: v })} />
-      <ListEditor label="✨ Skin Services (English)" items={data.skinServicesEn || []} onChange={v => set({ ...data, skinServicesEn: v })} />
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <ServiceListEditor label="Dental Services (বাংলা)" items={data.dentalServicesBn} onChange={v => set({ ...data, dentalServicesBn: v })} iconSet={DENTAL_ICONS} />
+      <ServiceListEditor label="Dental Services (English)" items={data.dentalServicesEn} onChange={v => set({ ...data, dentalServicesEn: v })} iconSet={DENTAL_ICONS} />
+      <ServiceListEditor label="Skin Services (বাংলা)" items={data.skinServicesBn} onChange={v => set({ ...data, skinServicesBn: v })} iconSet={SKIN_ICONS} />
+      <ServiceListEditor label="Skin Services (English)" items={data.skinServicesEn} onChange={v => set({ ...data, skinServicesEn: v })} iconSet={SKIN_ICONS} />
     </div>
   </div>
 );
 
 const DentalEditor = ({ data, set }) => (
   <div className="flex flex-col gap-5">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <InputField label="Title (বাংলা)" value={data.dentalTitleBn} onChange={e => set({ ...data, dentalTitleBn: e.target.value })} />
       <InputField label="Title (English)" value={data.dentalTitleEn} onChange={e => set({ ...data, dentalTitleEn: e.target.value })} />
       <InputField label="Description (বাংলা)" value={data.dentalDescBn} onChange={e => set({ ...data, dentalDescBn: e.target.value })} textarea />
       <InputField label="Description (English)" value={data.dentalDescEn} onChange={e => set({ ...data, dentalDescEn: e.target.value })} textarea />
     </div>
     <ImageField label="Dental Image" value={data.dentalImage} onChange={e => set({ ...data, dentalImage: e.target.value })} />
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <ListEditor label="🦷 Features (বাংলা)" items={data.dentalFeaturesBn || []} onChange={v => set({ ...data, dentalFeaturesBn: v })} />
-      <ListEditor label="🦷 Features (English)" items={data.dentalFeaturesEn || []} onChange={v => set({ ...data, dentalFeaturesEn: v })} />
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <FeatureListEditor label="Features (বাংলা)" items={data.dentalFeaturesBn} onChange={v => set({ ...data, dentalFeaturesBn: v })} iconSet={DENTAL_ICONS} />
+      <FeatureListEditor label="Features (English)" items={data.dentalFeaturesEn} onChange={v => set({ ...data, dentalFeaturesEn: v })} iconSet={DENTAL_ICONS} />
     </div>
   </div>
 );
 
 const SkinEditor = ({ data, set }) => (
   <div className="flex flex-col gap-5">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <InputField label="Title (বাংলা)" value={data.skinTitleBn} onChange={e => set({ ...data, skinTitleBn: e.target.value })} />
       <InputField label="Title (English)" value={data.skinTitleEn} onChange={e => set({ ...data, skinTitleEn: e.target.value })} />
       <InputField label="Description (বাংলা)" value={data.skinDescBn} onChange={e => set({ ...data, skinDescBn: e.target.value })} textarea />
       <InputField label="Description (English)" value={data.skinDescEn} onChange={e => set({ ...data, skinDescEn: e.target.value })} textarea />
     </div>
     <ImageField label="Skin Care Image" value={data.skinImage} onChange={e => set({ ...data, skinImage: e.target.value })} />
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <ListEditor label="✨ Features (বাংলা)" items={data.skinFeaturesBn || []} onChange={v => set({ ...data, skinFeaturesBn: v })} />
-      <ListEditor label="✨ Features (English)" items={data.skinFeaturesEn || []} onChange={v => set({ ...data, skinFeaturesEn: v })} />
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <FeatureListEditor label="Features (বাংলা)" items={data.skinFeaturesBn} onChange={v => set({ ...data, skinFeaturesBn: v })} iconSet={SKIN_ICONS} />
+      <FeatureListEditor label="Features (English)" items={data.skinFeaturesEn} onChange={v => set({ ...data, skinFeaturesEn: v })} iconSet={SKIN_ICONS} />
     </div>
   </div>
 );
 
 const AboutEditor = ({ data, set }) => (
   <div className="flex flex-col gap-5">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <InputField label="Title (বাংলা)" value={data.aboutTitleBn} onChange={e => set({ ...data, aboutTitleBn: e.target.value })} />
+      <InputField label="Title (English)" value={data.aboutTitleEn} onChange={e => set({ ...data, aboutTitleEn: e.target.value })} />
       <InputField label="Description (বাংলা)" value={data.aboutDescBn} onChange={e => set({ ...data, aboutDescBn: e.target.value })} textarea />
       <InputField label="Description (English)" value={data.aboutDescEn} onChange={e => set({ ...data, aboutDescEn: e.target.value })} textarea />
     </div>
     <ImageField label="About Image" value={data.aboutImage} onChange={e => set({ ...data, aboutImage: e.target.value })} />
-    <div className="grid grid-cols-3 gap-4">
-      {[1, 2, 3].map(n => (
-        <div key={n} className="flex flex-col gap-2 bg-white/5 p-4 rounded-2xl">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {[1,2,3].map(n => (
+        <div key={n} className="bg-white/5 p-4 rounded-2xl flex flex-col gap-2">
           <p className="text-[10px] text-[#D4AF37] font-black uppercase">Stat {n}</p>
-          <InputField label="Label" value={data[`aboutStat${n}Label`]} onChange={e => set({ ...data, [`aboutStat${n}Label`]: e.target.value })} />
-          <InputField label="Value (যেমন: 10+)" value={data[`aboutStat${n}Value`]} onChange={e => set({ ...data, [`aboutStat${n}Value`]: e.target.value })} />
+          <InputField label="Label" value={data[`aboutStat${n}Label`]} onChange={e => set({ ...data, [`aboutStat${n}Label`]: e.target.value })} placeholder="যেমন: Specialists" />
+          <InputField label="Value" value={data[`aboutStat${n}Value`]} onChange={e => set({ ...data, [`aboutStat${n}Value`]: e.target.value })} placeholder="যেমন: 10+" />
         </div>
       ))}
     </div>
@@ -252,54 +242,75 @@ const AboutEditor = ({ data, set }) => (
 );
 
 const ContactInfoEditor = ({ data, set }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-    <InputField label="Phone" value={data.phone} onChange={e => set({ ...data, phone: e.target.value })} />
-    <InputField label="WhatsApp Number" value={data.whatsapp} onChange={e => set({ ...data, whatsapp: e.target.value })} />
-    <InputField label="Address" value={data.address} onChange={e => set({ ...data, address: e.target.value })} />
-    <InputField label="Google Map Link" value={data.mapLink} onChange={e => set({ ...data, mapLink: e.target.value })} />
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <InputField label="Phone" value={data.phone} onChange={e => set({ ...data, phone: e.target.value })} placeholder="01700-000000" />
+    <InputField label="WhatsApp" value={data.whatsapp} onChange={e => set({ ...data, whatsapp: e.target.value })} placeholder="8801700000000" />
+    <InputField label="Address" value={data.address} onChange={e => set({ ...data, address: e.target.value })} placeholder="Moulvibazar, Sylhet" />
+    <InputField label="Google Map Link" value={data.mapLink} onChange={e => set({ ...data, mapLink: e.target.value })} placeholder="https://maps.google.com/..." />
   </div>
 );
 
-// ---- Main Component ----
-
+// ---- Main ----
 const ManageSiteContent = ({ lang }) => {
   const [activeSection, setActiveSection] = useState('hero');
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => { fetchSection(activeSection); }, [activeSection]);
 
   const fetchSection = async (sec) => {
     setLoading(true);
+    setError('');
     try {
       const res = await axios.get(`${API}/${sec}`);
       setData(res.data);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch { setError('ডেটা লোড হয়নি।'); }
     setLoading(false);
   };
 
   const handleSave = async () => {
     setSaving(true);
+    setError('');
     try {
-      await axios.put(`${API}/${activeSection}`, data);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
-    } catch (err) {
-      alert('Save failed!');
-    }
+      const { _id, __v, createdAt, updatedAt, section, ...cleanData } = data;
+      const res = await axios.put(`${API}/${activeSection}`, cleanData);
+      if (res.data?.success) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+        fetchSection(activeSection);
+      } else { setError('সেভ হয়নি।'); }
+    } catch { setError('সেভ failed!'); }
     setSaving(false);
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('এই section এর সব data delete করবেন?')) return;
+    try {
+      await axios.put(`${API}/${activeSection}`, {
+        heroTitleBn:'', heroTitleEn:'', heroSubBn:'', heroSubEn:'',
+        heroDescBn:'', heroDescEn:'', heroImage1:'', heroImage2:'',
+        servicesImage1:'', servicesImage2:'',
+        dentalServicesBn:[], dentalServicesEn:[],
+        skinServicesBn:[], skinServicesEn:[],
+        dentalTitleBn:'', dentalTitleEn:'', dentalDescBn:'', dentalDescEn:'', dentalImage:'',
+        dentalFeaturesBn:[], dentalFeaturesEn:[],
+        skinTitleBn:'', skinTitleEn:'', skinDescBn:'', skinDescEn:'', skinImage:'',
+        skinFeaturesBn:[], skinFeaturesEn:[],
+        aboutTitleBn:'', aboutTitleEn:'', aboutDescBn:'', aboutDescEn:'', aboutImage:'',
+        aboutStat1Label:'', aboutStat1Value:'',
+        aboutStat2Label:'', aboutStat2Value:'',
+        aboutStat3Label:'', aboutStat3Value:'',
+        phone:'', whatsapp:'', address:'', mapLink:'',
+      });
+      fetchSection(activeSection);
+    } catch { setError('Delete failed!'); }
+  };
+
   const renderEditor = () => {
-    if (loading) return (
-      <div className="text-gray-500 text-xs uppercase tracking-widest py-10 text-center animate-pulse">
-        লোড হচ্ছে...
-      </div>
-    );
+    if (loading) return <div className="text-gray-500 text-xs uppercase tracking-widest py-10 text-center animate-pulse">লোড হচ্ছে...</div>;
     switch (activeSection) {
       case 'hero':        return <HeroEditor data={data} set={setData} />;
       case 'services':    return <ServicesEditor data={data} set={setData} />;
@@ -313,32 +324,46 @@ const ManageSiteContent = ({ lang }) => {
 
   return (
     <div className="w-full space-y-6 pb-10">
-      <div className="flex flex-wrap gap-2">
+      {/* Tabs — horizontal scroll on mobile */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
         {sections.map(s => (
           <button key={s.key} onClick={() => setActiveSection(s.key)}
-            className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-              activeSection === s.key
-                ? 'bg-[#D4AF37] text-black'
-                : 'bg-white/5 text-gray-400 hover:text-[#D4AF37] border border-white/10'
+            className={`px-3 sm:px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap shrink-0 ${
+              activeSection === s.key ? 'bg-[#D4AF37] text-black' : 'bg-white/5 text-gray-400 hover:text-[#D4AF37] border border-white/10'
             }`}>
             {s.label}
           </button>
         ))}
       </div>
 
-      <div className="bg-[#111111] rounded-[28px] border border-white/5 p-6 md:p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-[#D4AF37] font-black uppercase tracking-widest text-sm italic">
+      <div className="bg-[#111111] rounded-[24px] sm:rounded-[28px] border border-white/5 p-4 sm:p-6 md:p-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 gap-2">
+          <h3 className="text-[#D4AF37] font-black uppercase tracking-widest text-xs sm:text-sm italic truncate">
             {sections.find(s => s.key === activeSection)?.label}
           </h3>
-          <button onClick={handleSave} disabled={saving}
-            className={`flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-black uppercase transition-all ${
-              saved ? 'bg-green-500 text-white' : 'bg-[#D4AF37] text-black hover:bg-white'
-            }`}>
-            <Save size={13} />
-            {saving ? 'সেভ হচ্ছে...' : saved ? '✓ সেভ হয়েছে!' : 'সেভ করুন'}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button onClick={handleDelete}
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-[10px] font-black uppercase bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all">
+              <Trash2 size={12} />
+              <span className="hidden sm:inline">ডিলিট</span>
+            </button>
+            <button onClick={handleSave} disabled={saving}
+              className={`flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-full text-[10px] font-black uppercase transition-all ${
+                saved ? 'bg-green-500 text-white' : saving ? 'bg-gray-600 text-gray-300 cursor-not-allowed' : 'bg-[#D4AF37] text-black hover:bg-white'
+              }`}>
+              <Save size={12} />
+              <span>{saving ? 'সেভ...' : saved ? '✓ সেভ!' : 'সেভ করুন'}</span>
+            </button>
+          </div>
         </div>
+
+        {error && (
+          <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-xl font-bold uppercase tracking-widest">
+            ⚠ {error}
+          </div>
+        )}
+
         {renderEditor()}
       </div>
     </div>
