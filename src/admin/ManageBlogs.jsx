@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Image as ImageIcon, Type, Layout, Trash2, Edit, X } from 'lucide-react';
+import { Save, Image as ImageIcon, Type, Layout, Trash2, Edit, X, Upload, Loader2 } from 'lucide-react';
 import axios from 'axios';
 
 const ManageBlogs = ({ lang }) => {
@@ -8,6 +8,7 @@ const ManageBlogs = ({ lang }) => {
   const [blogs, setBlogs] = useState([]);
   const [blogData, setBlogData] = useState({ title: '', category: 'Dental Care', image: '', content: '' });
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false); // ইমেজ আপলোডিং স্টেট
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -24,6 +25,30 @@ const ManageBlogs = ({ lang }) => {
   useEffect(() => {
     fetchBlogs();
   }, []);
+
+  // ইমেজ আপলোড হ্যান্ডলার (Cloudinary)
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "your_upload_preset"); // আপনার Cloudinary upload_preset এখানে দিন
+
+    try {
+      setUploading(true);
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", // আপনার Cloudinary Cloud Name এখানে দিন
+        formData
+      );
+      setBlogData({ ...blogData, image: res.data.secure_url });
+    } catch (err) {
+      alert("Image upload failed!");
+      console.error(err);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // ২. ব্লগ সেভ বা আপডেট করা
   const handleSubmit = async (e) => {
@@ -107,17 +132,43 @@ const ManageBlogs = ({ lang }) => {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-[10px] uppercase font-bold text-gray-500 flex items-center gap-2"><ImageIcon size={12}/> Image URL</label>
-            <div className="flex flex-col md:flex-row gap-4 items-start">
-                <input required type="text" value={blogData.image} onChange={(e)=>setBlogData({...blogData, image: e.target.value})} className="bg-black/50 border border-white/5 p-4 rounded-2xl outline-none focus:border-[#D4AF37] text-white w-full" placeholder="https://image-link.com/photo.jpg" />
+            <label className="text-[10px] uppercase font-bold text-gray-500 flex items-center gap-2"><ImageIcon size={12}/> Image Selection</label>
+            <div className="bg-black/30 p-6 rounded-3xl border border-white/5 space-y-4">
+              <div className="flex flex-col md:flex-row gap-6 items-center">
+                {/* File Upload Button */}
+                <label className="w-full md:w-auto flex-1 flex flex-col items-center justify-center border-2 border-dashed border-white/10 hover:border-[#D4AF37]/50 p-6 rounded-2xl cursor-pointer transition-all bg-black/20 group">
+                  {uploading ? (
+                    <Loader2 className="animate-spin text-[#D4AF37]" size={24} />
+                  ) : (
+                    <>
+                      <Upload className="text-gray-500 group-hover:text-[#D4AF37]" size={20} />
+                      <span className="text-[10px] font-bold uppercase mt-2 text-gray-400">পিসি থেকে ছবি নিন</span>
+                    </>
+                  )}
+                  <input type="file" className="hidden" onChange={handleFileUpload} accept="image/*" disabled={uploading} />
+                </label>
+
+                {/* Manual URL Input */}
+                <div className="w-full flex-[2] flex flex-col gap-2">
+                  <span className="text-[10px] font-bold uppercase text-gray-600">বা সরাসরি ছবির লিঙ্ক দিন</span>
+                  <input required type="text" value={blogData.image} onChange={(e)=>setBlogData({...blogData, image: e.target.value})} className="bg-black/50 border border-white/5 p-4 rounded-xl outline-none focus:border-[#D4AF37] text-white text-sm" placeholder="https://image-link.com/photo.jpg" />
+                </div>
+
+                {/* Preview Thumbnail */}
                 {blogData.image && (
-                    <img 
-                        src={blogData.image} 
-                        alt="Preview" 
-                        className="w-20 h-20 object-cover rounded-xl border border-[#D4AF37]/30"
-                        onError={(e) => { e.target.src = 'https://via.placeholder.com/400'; }}
-                    />
+                    <div className="relative group">
+                      <img 
+                          src={blogData.image} 
+                          alt="Preview" 
+                          className="w-24 h-24 object-cover rounded-xl border border-[#D4AF37]/30 shadow-lg"
+                          onError={(e) => { e.target.src = 'https://via.placeholder.com/400'; }}
+                      />
+                      <button onClick={() => setBlogData({...blogData, image: ''})} className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-all">
+                        <X size={12}/>
+                      </button>
+                    </div>
                 )}
+              </div>
             </div>
           </div>
 
@@ -126,7 +177,7 @@ const ManageBlogs = ({ lang }) => {
             <textarea required rows="5" value={blogData.content} onChange={(e)=>setBlogData({...blogData, content: e.target.value})} className="bg-black/50 border border-white/5 p-4 rounded-2xl outline-none focus:border-[#D4AF37] text-white" placeholder="Write blog content here..."></textarea>
           </div>
 
-          <button disabled={loading} type="submit" className="bg-[#D4AF37] text-black font-black uppercase py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-white transition-all">
+          <button disabled={loading || uploading} type="submit" className={`bg-[#D4AF37] text-black font-black uppercase py-4 rounded-2xl flex items-center justify-center gap-3 transition-all ${loading || uploading ? 'opacity-50' : 'hover:bg-white'}`}>
             <Save size={18}/> {loading ? "Processing..." : (isEditing ? (lang === 'bn' ? "আপডেট করুন" : "Update Blog") : (lang === 'bn' ? "পাবলিশ করুন" : "Publish Blog"))}
           </button>
         </form>
