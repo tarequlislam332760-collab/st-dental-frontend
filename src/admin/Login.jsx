@@ -3,32 +3,44 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react';
 
-const ADMINS = [
-  { email: 'admin@stlesser.com', password: 'admin123', name: 'Tareq Islam', initials: 'TI', role: 'Super Admin' },
-  // নতুন admin যোগ করতে এখানে আরেকটা লাইন যোগ করুন:
-  // { email: 'doctor@stlesser.com', password: 'doctor123', name: 'Dr. Rahman', initials: 'DR', role: 'Doctor' },
+// ✅ শুধু email ও password চেক হবে — নাম user নিজে দেবে
+const VALID_CREDENTIALS = [
+  { email: 'admin@stlesser.com', password: 'admin123', role: 'Super Admin' },
+  // নতুন admin যোগ করতে এখানে লাইন যোগ করুন:
+  // { email: 'doctor@stlesser.com', password: 'doctor123', role: 'Doctor' },
 ];
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [name, setName]         = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError]       = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
+    if (!name.trim()) {
+      setError('দয়া করে আপনার নাম লিখুন।');
+      setIsLoading(false);
+      return;
+    }
+
     setTimeout(() => {
-      const admin = ADMINS.find(a => a.email === email && a.password === password);
+      const admin = VALID_CREDENTIALS.find(
+        a => a.email === email && a.password === password
+      );
 
       if (admin) {
-        localStorage.setItem('adminToken', 'true');
-        localStorage.setItem('adminName', admin.name);
-        localStorage.setItem('adminInitials', admin.initials);
-        localStorage.setItem('adminRole', admin.role);
+        // নাম user এর দেওয়া নাম থেকে নেওয়া হচ্ছে
+        const initials = name.trim().split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        localStorage.setItem('adminToken',    'true');
+        localStorage.setItem('adminName',     name.trim());
+        localStorage.setItem('adminInitials', initials);
+        localStorage.setItem('adminRole',     admin.role);
         navigate('/st-admin-secure');
       } else {
         setError('ভুল ইমেইল অথবা পাসওয়ার্ড! আবার চেষ্টা করুন।');
@@ -67,6 +79,23 @@ const Login = () => {
               </motion.div>
             )}
 
+            {/* নাম */}
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Your Name</label>
+              <div className="relative group">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#D4AF37] transition-colors" size={20} />
+                <input
+                  type="text"
+                  required
+                  placeholder="আপনার নাম লিখুন"
+                  value={name}
+                  className="w-full bg-[#0a0a0a] border border-white/5 p-4 pl-12 rounded-xl text-white outline-none focus:border-[#D4AF37] transition-all"
+                  onChange={e => setName(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Email */}
             <div className="space-y-2">
               <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Email Address</label>
               <div className="relative group">
@@ -76,11 +105,12 @@ const Login = () => {
                   required
                   placeholder="admin@stlesser.com"
                   className="w-full bg-[#0a0a0a] border border-white/5 p-4 pl-12 rounded-xl text-white outline-none focus:border-[#D4AF37] transition-all"
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                 />
               </div>
             </div>
 
+            {/* Password */}
             <div className="space-y-2">
               <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Password</label>
               <div className="relative group">
@@ -90,7 +120,7 @@ const Login = () => {
                   required
                   placeholder="••••••••"
                   className="w-full bg-[#0a0a0a] border border-white/5 p-4 pl-12 rounded-xl text-white outline-none focus:border-[#D4AF37] transition-all"
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                 />
               </div>
             </div>
@@ -104,7 +134,6 @@ const Login = () => {
                 <><Loader2 className="animate-spin" size={20} /> Verifying...</>
               ) : 'Access Dashboard'}
             </button>
-
           </form>
         </div>
 
