@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, NavLink, useLocation } from 'react-router-dom';
 import * as Lucide from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- পেজ এবং সেকশন ইম্পোর্ট ---
 import Home from './pages/Home';
 import Blog from './pages/Blog';
 import WhatsAppWidget from './components/WhatsAppWidget';
@@ -14,305 +13,311 @@ import Contact from './sections/Contact';
 import DentalCare from './sections/DentalCare';
 import SkinCare from './sections/SkinCare';
 import Testimonials from './sections/Testimonials';
-
-import TransformSlider from "./components/TransformSlider.jsx";
-import BeforeAfterSlider from "./components/BeforeAfterSlider.jsx";
-
-// --- অ্যাডমিন প্যানেল ইম্পোর্ট ---
+import TransformSlider from './components/TransformSlider.jsx';
+import BeforeAfterSlider from './components/BeforeAfterSlider.jsx';
 import AdminPanel from './admin/AdminPanel';
 import Login from './admin/Login';
 import ProtectedRoute from './admin/ProtectedRoute';
 
-const SafeIcon = ({ name, size = 20, className = "" }) => {
-  const IconComponent = Lucide[name] || Lucide.HelpCircle;
-  return <IconComponent size={size} className={className} />;
+// ── Brand colors (logo-matched)
+// Primary: #0891B2 (cyan-600)  Secondary: #0F172A (slate-900)  Accent: #06B6D4 (cyan-400)
+
+const SafeIcon = ({ name, size = 20, className = '' }) => {
+  const IC = Lucide[name] || Lucide.HelpCircle;
+  return <IC size={size} className={className} />;
 };
 
 const translations = {
   bn: {
-    home: "হোম", services: "সেবা", about: "আমাদের সম্পর্কে", contact: "যোগাযোগ",
-    dental: "ডেন্টাল কেয়ার", skin: "স্কিন কেয়ার", treatment: "ট্রিটমেন্ট",
-    testimonials: "রিভিউ", btn: "সিরিয়াল নিন", other: "অন্যান্য সেবা", call: "কল করুন", whatsapp: "হোয়াটসঅ্যাপ",
-    blog: "ব্লগ", transform: "ট্রান্সফর্ম", beforeAfter: "বিফোর-আফটার",
+    home: 'হোম', services: 'সেবা', about: 'আমাদের সম্পর্কে', contact: 'যোগাযোগ',
+    dental: 'ডেন্টাল কেয়ার', skin: 'স্কিন কেয়ার', treatment: 'চিকিৎসা',
+    testimonials: 'রিভিউ', btn: 'সিরিয়াল নিন', blog: 'ব্লগ',
+    transform: 'ট্রান্সফর্ম', beforeAfter: 'বিফোর-আফটার', call: 'কল করুন',
   },
   en: {
-    home: "Home", services: "Services", about: "About", contact: "Contact",
-    dental: "Dental Care", skin: "Skin Care", treatment: "Treatment",
-    testimonials: "Testimonials", btn: "Get Appointment", other: "Other Services", call: "Call Now", whatsapp: "WhatsApp",
-    blog: "Blog", transform: "Transform", beforeAfter: "Before-After",
+    home: 'Home', services: 'Services', about: 'About', contact: 'Contact',
+    dental: 'Dental Care', skin: 'Skin Care', treatment: 'Treatment',
+    testimonials: 'Testimonials', btn: 'Book Now', blog: 'Blog',
+    transform: 'Transform', beforeAfter: 'Before & After', call: 'Call Now',
   },
-  ar: { home: "الرئيسية", services: "خدمات", about: "حول", contact: "اتصال", dental: "الأسنان", skin: "البشرة", treatment: "علاج", testimonials: "شهادات", btn: "حجز موعد", call: "اتصل", whatsapp: "واتساب", blog: "مدونة", transform: "تحويل", beforeAfter: "قبل وبعد" },
-  hi: { home: "होम", services: "सेवाएं", about: "हमारे बारे में", contact: "संपर्क", dental: "दंत चिकित्सा", skin: "त्वचा देखभाल", treatment: "उपचार", testimonials: "प्रमाणपत्र", btn: "अपॉइंटमेंट", call: "कॉल करें", whatsapp: "व्हाट्सएप", blog: "ब्लॉग", transform: "ट्रांसफॉर्म", beforeAfter: "पहले-बाद" },
-  es: { home: "Inicio", services: "Servicios", about: "Nosotros", contact: "Contacto", dental: "Dental", skin: "Piel", treatment: "Tratamiento", testimonials: "Testimonios", btn: "Reservar", call: "Llamar", whatsapp: "WhatsApp", blog: "Blog", transform: "Transformar", beforeAfter: "Antes/Después" },
-  fr: { home: "Accueil", services: "Services", about: "À propos", contact: "Contact", dental: "Dentaire", skin: "Peau", treatment: "Traitement", testimonials: "Témoignages", btn: "Réserver", call: "Appeler", whatsapp: "WhatsApp", blog: "Blog", transform: "Transformer", beforeAfter: "Avant/Après" },
-  de: { home: "Startseite", services: "Dienste", about: "Über uns", contact: "Kontakt", dental: "Zahnpflege", skin: "Hautpflege", treatment: "Behandlung", testimonials: "Referenzen", btn: "Buchen", call: "Anrufen", whatsapp: "WhatsApp", blog: "Blog", transform: "Verwandeln", beforeAfter: "Vorher/Nachher" },
-  zh: { home: "首页", services: "服务", about: "关于", contact: "联系", dental: "牙科", skin: "皮肤", treatment: "治疗", testimonials: "评价", btn: "预订", call: "打电话", whatsapp: "WhatsApp", blog: "博客", transform: "转型", beforeAfter: "前后" },
-  ru: { home: "Главная", services: "Услуги", about: "О нас", contact: "Контакт", dental: "Зубы", skin: "Кожа", treatment: "Лечение", testimonials: "Отзывы", btn: "Забронировать", call: "Позвонить", whatsapp: "WhatsApp", blog: "Блог", transform: "Трансформация", beforeAfter: "До/После" },
-  tr: { home: "Anasayfa", services: "Hizmetler", about: "Hakkımızda", contact: "İletişim", dental: "Diş", skin: "Cilt", treatment: "Tedavi", testimonials: "Yorumlar", btn: "Randevu Al", call: "Ara", whatsapp: "WhatsApp", blog: "Blog", transform: "Dönüşüm", beforeAfter: "Önce/Sonra" }
+  ar: { home: 'الرئيسية', services: 'خدمات', about: 'حول', contact: 'اتصال', dental: 'الأسنان', skin: 'البشرة', treatment: 'علاج', testimonials: 'شهادات', btn: 'احجز', blog: 'مدونة', transform: 'تحويل', beforeAfter: 'قبل وبعد', call: 'اتصل' },
+  hi: { home: 'होम', services: 'सेवाएं', about: 'हमारे बारे में', contact: 'संपर्क', dental: 'दंत', skin: 'त्वचा', treatment: 'उपचार', testimonials: 'समीक्षा', btn: 'बुक करें', blog: 'ब्लॉग', transform: 'ट्रांसफॉर्म', beforeAfter: 'पहले-बाद', call: 'कॉल करें' },
+  es: { home: 'Inicio', services: 'Servicios', about: 'Nosotros', contact: 'Contacto', dental: 'Dental', skin: 'Piel', treatment: 'Tratamiento', testimonials: 'Testimonios', btn: 'Reservar', blog: 'Blog', transform: 'Transformar', beforeAfter: 'Antes/Después', call: 'Llamar' },
+  fr: { home: 'Accueil', services: 'Services', about: 'À propos', contact: 'Contact', dental: 'Dentaire', skin: 'Peau', treatment: 'Traitement', testimonials: 'Témoignages', btn: 'Réserver', blog: 'Blog', transform: 'Transformer', beforeAfter: 'Avant/Après', call: 'Appeler' },
+  de: { home: 'Startseite', services: 'Dienste', about: 'Über uns', contact: 'Kontakt', dental: 'Zahnpflege', skin: 'Hautpflege', treatment: 'Behandlung', testimonials: 'Referenzen', btn: 'Buchen', blog: 'Blog', transform: 'Verwandeln', beforeAfter: 'Vorher/Nachher', call: 'Anrufen' },
+  zh: { home: '首页', services: '服务', about: '关于', contact: '联系', dental: '牙科', skin: '皮肤', treatment: '治疗', testimonials: '评价', btn: '预订', blog: '博客', transform: '转型', beforeAfter: '前后', call: '打电话' },
+  ru: { home: 'Главная', services: 'Услуги', about: 'О нас', contact: 'Контакт', dental: 'Зубы', skin: 'Кожа', treatment: 'Лечение', testimonials: 'Отзывы', btn: 'Забронировать', blog: 'Блог', transform: 'Трансформация', beforeAfter: 'До/После', call: 'Позвонить' },
+  tr: { home: 'Anasayfa', services: 'Hizmetler', about: 'Hakkımızda', contact: 'İletişim', dental: 'Diş', skin: 'Cilt', treatment: 'Tedavi', testimonials: 'Yorumlar', btn: 'Randevu Al', blog: 'Blog', transform: 'Dönüşüm', beforeAfter: 'Önce/Sonra', call: 'Ara' },
 };
 
 const languages = [
-  { code: 'en', name: 'English',  flag: '🇬🇧' },
-  { code: 'bn', name: 'বাংলা',   flag: '🇧🇩' },
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'bn', name: 'বাংলা', flag: '🇧🇩' },
   { code: 'ar', name: 'العربية', flag: '🇸🇦' },
   { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
   { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'Français',flag: '🇫🇷' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'zh', name: '中文',    flag: '🇨🇳' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
   { code: 'ru', name: 'Русский', flag: '🇷🇺' },
   { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
 ];
 
+// SVG tooth logo — matches clinic brand
+const ToothLogo = ({ size = 40 }) => (
+  <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="40" cy="40" r="38" fill="#0891B2" stroke="#06B6D4" strokeWidth="2"/>
+    <path d="M25 22c-4 0-8 4-8 10 0 4 1 8 3 10l4 18h4l3-12 3 12h4l4-18c2-2 3-6 3-10 0-6-4-10-8-10-2 0-4 1-5 3-1-2-3-3-7-3z" fill="white" opacity="0.95"/>
+    <path d="M33 22c1 2 2 4 2 6s-1 4-2 6" stroke="#0891B2" strokeWidth="1.5" strokeLinecap="round"/>
+  </svg>
+);
+
 const AppContent = () => {
   const [lang, setLang] = useState('bn');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobileTreatmentOpen, setIsMobileTreatmentOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isTreatmentOpen, setIsTreatmentOpen] = useState(false);
-  const [isLangOpen, setIsLangOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [treatOpen, setTreatOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [mobileTreatOpen, setMobileTreatOpen] = useState(false);
+  const treatRef = useRef(null);
+  const langRef = useRef(null);
 
   const location = useLocation();
-  const isAdminPath = location.pathname.startsWith('/st-admin-secure');
-  const currentLang = languages.find(l => l.code === lang) || languages[0];
-  const t = translations[lang] || translations['en'];
+  const isAdmin = location.pathname.startsWith('/st-admin-secure');
+  const t = translations[lang] || translations.en;
+  const curLang = languages.find(l => l.code === lang) || languages[0];
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll);
     document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, [lang]);
 
   useEffect(() => {
-    const handleClickOutside = () => {
-      setIsTreatmentOpen(false);
-      setIsLangOpen(false);
+    const handler = (e) => {
+      if (treatRef.current && !treatRef.current.contains(e.target)) setTreatOpen(false);
+      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
     };
-    window.addEventListener('click', handleClickOutside);
-    return () => window.removeEventListener('click', handleClickOutside);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Mobile menu scroll lock
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    };
-  }, [isMobileMenuOpen]);
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
 
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-    setIsMobileTreatmentOpen(false);
-  };
+  const closeMenu = () => { setMenuOpen(false); setMobileTreatOpen(false); };
+
+  const navLinks = [
+    { label: t.home, path: '/' },
+    { label: t.services, path: '/services' },
+    { label: t.blog, path: '/blog' },
+    { label: t.about, path: '/about' },
+    { label: t.contact, path: '/contact' },
+    { label: t.testimonials, path: '/testimonials' },
+  ];
+
+  const treatLinks = [
+    { label: t.dental, path: '/dental-care' },
+    { label: t.skin, path: '/skin-care' },
+    { label: t.transform, path: '/transform' },
+    { label: t.beforeAfter, path: '/before-after' },
+  ];
 
   return (
-    <div className="min-h-screen bg-white font-sans text-[#1a1a1a] overflow-x-hidden">
+    <div className="min-h-screen bg-[#0a1628] text-white font-sans overflow-x-hidden">
 
-      {!isAdminPath && (
-        <header className={`fixed top-0 w-full z-[100] transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md py-2' : 'bg-white py-4'}`}>
-          <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between">
+      {/* ── NAVBAR ── */}
+      {!isAdmin && (
+        <header className={`fixed top-0 w-full z-[100] transition-all duration-500 ${
+          scrolled
+            ? 'bg-[#0a1628]/95 backdrop-blur-xl border-b border-cyan-500/10 py-2 shadow-lg shadow-cyan-900/20'
+            : 'bg-transparent py-4'
+        }`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between">
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2 md:gap-3">
-              <div className="w-9 h-9 md:w-11 md:h-11 bg-[#D4AF37] rounded-full flex items-center justify-center text-white font-black shadow-lg text-sm md:text-base">ST</div>
-              <div className="flex flex-col">
-                <h1 className="font-black text-xs md:text-lg uppercase tracking-tighter leading-none">S T LESSER</h1>
-                <p className="text-[#D4AF37] text-[7px] md:text-[9px] font-bold uppercase tracking-widest">Dental & Aesthetic Care</p>
+            <Link to="/" className="flex items-center gap-3 group">
+              <motion.div whileHover={{ rotate: 10, scale: 1.05 }} transition={{ type: 'spring', stiffness: 300 }}>
+                <ToothLogo size={42} />
+              </motion.div>
+              <div>
+                <p className="font-black text-white text-sm uppercase tracking-[2px] leading-none">
+                  S.T <span className="text-cyan-400">Laser</span>
+                </p>
+                <p className="text-cyan-500/70 text-[8px] uppercase tracking-[2px] mt-0.5">Dental & Skin Care</p>
               </div>
             </Link>
 
             {/* Desktop Nav */}
-            <nav className="hidden lg:flex items-center gap-8">
-              {[
-                { name: t.home, path: "/" },
-                { name: t.services, path: "/services" },
-                { name: t.blog, path: "/blog" },
-                { name: t.about, path: "/about" },
-                { name: t.contact, path: "/contact" },
-                { name: t.testimonials, path: "/testimonials" }
-              ].map((item, i) => (
-                <NavLink key={i} to={item.path} className={({ isActive }) => `relative text-[11px] font-bold uppercase tracking-wider transition-colors ${isActive ? 'text-[#D4AF37]' : 'text-gray-600 hover:text-[#D4AF37]'}`}>
+            <nav className="hidden lg:flex items-center gap-7">
+              {navLinks.map((item) => (
+                <NavLink key={item.path} to={item.path}
+                  className={({ isActive }) =>
+                    `text-[10px] font-bold uppercase tracking-[2px] transition-all relative group ${
+                      isActive ? 'text-cyan-400' : 'text-white/50 hover:text-white'
+                    }`
+                  }>
                   {({ isActive }) => (
                     <>
-                      {item.name}
-                      {isActive && <motion.div layoutId="underline" className="absolute -bottom-1 left-0 w-full h-[2.5px] bg-[#D4AF37] rounded-full" />}
+                      {item.label}
+                      <span className={`absolute -bottom-1 left-0 h-px bg-cyan-400 transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`} />
                     </>
                   )}
                 </NavLink>
               ))}
-              <div className="relative" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => setIsTreatmentOpen(!isTreatmentOpen)} className="flex items-center gap-1 text-[11px] font-bold uppercase text-gray-600 hover:text-[#D4AF37]">
-                  {t.treatment} <SafeIcon name="ChevronDown" size={12} className={`transition-transform ${isTreatmentOpen ? 'rotate-180' : ''}`} />
+
+              <div ref={treatRef} className="relative">
+                <button onClick={() => setTreatOpen(!treatOpen)}
+                  className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[2px] text-white/50 hover:text-white transition-colors">
+                  {t.treatment}
+                  <Lucide.ChevronDown size={11} className={`transition-transform duration-300 ${treatOpen ? 'rotate-180' : ''}`} />
                 </button>
-                {isTreatmentOpen && (
-                  <div className="absolute top-full left-0 w-48 bg-white shadow-2xl border-t-4 border-[#D4AF37] py-3 rounded-b-xl z-[110]">
-                    <Link to="/dental-care" onClick={() => setIsTreatmentOpen(false)} className="block px-6 py-2 hover:bg-gray-50 hover:text-[#D4AF37] text-[11px] font-bold">{t.dental}</Link>
-                    <Link to="/skin-care" onClick={() => setIsTreatmentOpen(false)} className="block px-6 py-2 hover:bg-gray-50 hover:text-[#D4AF37] text-[11px] font-bold">{t.skin}</Link>
-                    <Link to="/transform" onClick={() => setIsTreatmentOpen(false)} className="block px-6 py-2 hover:bg-gray-50 hover:text-[#D4AF37] text-[11px] font-bold">{t.transform}</Link>
-                    <Link to="/before-after" onClick={() => setIsTreatmentOpen(false)} className="block px-6 py-2 hover:bg-gray-50 hover:text-[#D4AF37] text-[11px] font-bold">{t.beforeAfter}</Link>
-                  </div>
-                )}
+                <AnimatePresence>
+                  {treatOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 mt-3 w-52 bg-[#0f1f3d] border border-cyan-500/20 rounded-2xl overflow-hidden shadow-2xl shadow-cyan-900/30">
+                      {treatLinks.map((l) => (
+                        <Link key={l.path} to={l.path} onClick={() => setTreatOpen(false)}
+                          className="flex items-center gap-3 px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-white/60 hover:text-cyan-400 hover:bg-cyan-500/5 transition-all border-b border-white/5 last:border-0">
+                          <Lucide.ChevronRight size={12} className="text-cyan-500" />
+                          {l.label}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </nav>
 
-            {/* Right Side */}
-            <div className="flex items-center gap-2 md:gap-3">
-              {/* Language Dropdown */}
-              <div className="relative" onClick={(e) => e.stopPropagation()}>
-                <button
-                  onClick={() => setIsLangOpen(!isLangOpen)}
-                  className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 px-2.5 py-1.5 rounded-full text-[10px] font-black hover:border-[#D4AF37] transition-all"
-                >
-                  <span className="text-sm leading-none">{currentLang.flag}</span>
-                  <span className="uppercase hidden sm:inline">{currentLang.code}</span>
-                  <SafeIcon name="ChevronDown" size={11} className={`text-gray-400 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
+            {/* Right */}
+            <div className="flex items-center gap-3">
+              {/* Call button - always visible */}
+              <a href="tel:01616484616" className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/30 text-cyan-400 text-[10px] font-bold hover:bg-cyan-500/10 transition-all">
+                <Lucide.Phone size={13} /> 01616-484616
+              </a>
+
+              {/* Lang */}
+              <div ref={langRef} className="relative hidden sm:block">
+                <button onClick={() => setLangOpen(!langOpen)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-wider hover:border-cyan-500/50 transition-all text-white/60">
+                  <span className="text-sm leading-none">{curLang.flag}</span>
+                  {curLang.code}
+                  <Lucide.ChevronDown size={10} className={`transition-transform ${langOpen ? 'rotate-180' : ''}`} />
                 </button>
-                {isLangOpen && (
-                  <div className="absolute top-full right-0 w-44 bg-white shadow-xl border-t-2 border-[#D4AF37] mt-1 rounded-lg max-h-64 overflow-y-auto z-[110]">
-                    {languages.map((l) => (
-                      <button
-                        key={l.code}
-                        onClick={() => { setLang(l.code); setIsLangOpen(false); }}
-                        className={`flex items-center gap-3 w-full text-left px-4 py-2.5 text-[11px] font-bold hover:bg-gray-50 transition-colors ${lang === l.code ? 'text-[#D4AF37]' : 'text-gray-700'}`}
-                      >
-                        <span className="text-sm">{l.flag}</span>
-                        <span>{l.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <AnimatePresence>
+                  {langOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+                      className="absolute top-full right-0 mt-2 w-44 bg-[#0f1f3d] border border-cyan-500/20 rounded-xl overflow-hidden shadow-2xl max-h-64 overflow-y-auto z-50">
+                      {languages.map((l) => (
+                        <button key={l.code} onClick={() => { setLang(l.code); setLangOpen(false); }}
+                          className={`flex items-center gap-3 w-full px-4 py-2.5 text-[11px] font-bold transition-all hover:bg-cyan-500/5 ${lang === l.code ? 'text-cyan-400' : 'text-white/50'}`}>
+                          <span className="text-sm">{l.flag}</span>{l.name}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
-              {/* Appointment Button - Desktop */}
-              <Link to="/appointment" className="hidden sm:block">
-                <button className="bg-[#1a1a1a] text-[#D4AF37] border border-[#D4AF37] px-4 py-2 rounded-full font-bold text-[10px] uppercase hover:bg-[#D4AF37] hover:text-white transition-all shadow-md whitespace-nowrap">
-                  {t.btn}
-                </button>
+              {/* CTA */}
+              <Link to="/appointment"
+                className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black text-[10px] uppercase tracking-[2px] hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/25">
+                {t.btn}
               </Link>
 
               {/* Hamburger */}
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden p-1.5 text-[#D4AF37] bg-gray-50 rounded-lg"
-              >
-                <SafeIcon name="Menu" size={24} />
+              <button onClick={() => setMenuOpen(true)} className="lg:hidden p-2 text-white/60 hover:text-cyan-400 transition-colors">
+                <Lucide.Menu size={24} />
               </button>
             </div>
           </div>
         </header>
       )}
 
-      {/* ── Mobile Menu ── */}
-      {isMobileMenuOpen && !isAdminPath && (
-        <>
-          {/* Overlay */}
-          <div
-            className="fixed inset-0 bg-black/60 z-[150] backdrop-blur-sm"
-            onClick={closeMobileMenu}
-          />
+      {/* ── MOBILE MENU ── */}
+      <AnimatePresence>
+        {menuOpen && !isAdmin && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[150]"
+              onClick={closeMenu} />
+            <motion.div
+              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3 }}
+              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-[#0a1628] border-l border-cyan-500/10 z-[200] flex flex-col"
+              onTouchMove={e => e.stopPropagation()}>
 
-          {/* Sidebar */}
-          <div className="fixed right-0 top-0 h-full w-[300px] bg-white z-[200] shadow-2xl flex flex-col">
-
-            {/* Sidebar Header — fixed */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-[#D4AF37] rounded-full flex items-center justify-center text-white font-black text-xs">ST</div>
-                <span className="font-black text-sm uppercase">ST <span className="text-[#D4AF37]">LESSER</span></span>
+              <div className="flex items-center justify-between px-6 py-5 border-b border-cyan-500/10">
+                <div className="flex items-center gap-2">
+                  <ToothLogo size={32} />
+                  <span className="text-white font-black text-sm uppercase tracking-widest">S.T <span className="text-cyan-400">Laser</span></span>
+                </div>
+                <button onClick={closeMenu} className="p-1.5 text-white/30 hover:text-white transition-colors">
+                  <Lucide.X size={20} />
+                </button>
               </div>
-              <button onClick={closeMobileMenu} className="p-1.5 bg-gray-100 rounded-full">
-                <SafeIcon name="X" size={18} />
-              </button>
-            </div>
 
-            {/* Appointment Button — always visible below header */}
-            <div className="px-5 pt-4 pb-2 flex-shrink-0">
-              <Link
-                to="/appointment"
-                onClick={closeMobileMenu}
-                className="w-full bg-[#1a1a1a] text-[#D4AF37] border border-[#D4AF37] py-3 rounded-xl flex items-center justify-center gap-2 font-black text-xs uppercase tracking-widest hover:bg-[#D4AF37] hover:text-black transition-all"
-              >
-                <SafeIcon name="CalendarDays" size={15} /> {t.btn}
-              </Link>
-            </div>
+              <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-6 flex flex-col gap-1">
+                <a href="tel:01616484616" className="w-full py-3.5 rounded-2xl border border-cyan-500/30 text-cyan-400 font-black text-xs uppercase tracking-[2px] text-center mb-3 flex items-center justify-center gap-2">
+                  <Lucide.Phone size={14} /> 01616-484616
+                </a>
+                <Link to="/appointment" onClick={closeMenu}
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black text-xs uppercase tracking-[2px] text-center mb-4">
+                  {t.btn}
+                </Link>
 
-            {/* Scrollable Content */}
-            <div
-              className="flex-1 overflow-y-auto overscroll-contain px-5 pb-6"
-              onTouchMove={(e) => e.stopPropagation()}
-            >
-              {/* Nav Links */}
-              <p className="text-[9px] font-black text-gray-400 uppercase tracking-[3px] mb-2 mt-3">Menu</p>
-              <nav className="flex flex-col gap-1">
-                {[
-                  { name: t.home, path: "/" },
-                  { name: t.services, path: "/services" },
-                  { name: t.blog, path: "/blog" },
-                  { name: t.about, path: "/about" },
-                  { name: t.contact, path: "/contact" },
-                  { name: t.testimonials, path: "/testimonials" },
-                ].map((item, i) => (
-                  <Link
-                    key={i}
-                    to={item.path}
-                    onClick={closeMobileMenu}
-                    className="px-4 py-3 rounded-xl font-bold text-sm text-gray-800 hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-all"
-                  >
-                    {item.name}
+                <p className="text-[9px] text-white/20 uppercase tracking-[3px] font-black mb-2">Menu</p>
+                {navLinks.map((item) => (
+                  <Link key={item.path} to={item.path} onClick={closeMenu}
+                    className="px-3 py-3 rounded-xl text-sm font-bold text-white/50 hover:text-white hover:bg-cyan-500/5 transition-all">
+                    {item.label}
                   </Link>
                 ))}
 
-                {/* Treatment Dropdown */}
-                <button
-                  onClick={() => setIsMobileTreatmentOpen(!isMobileTreatmentOpen)}
-                  className="flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-gray-800 hover:bg-gray-50 hover:text-[#D4AF37] transition-all w-full text-left"
-                >
-                  <span>{t.treatment}</span>
-                  <SafeIcon name="ChevronDown" size={15} className={`transition-transform ${isMobileTreatmentOpen ? 'rotate-180' : ''}`} />
+                <button onClick={() => setMobileTreatOpen(!mobileTreatOpen)}
+                  className="flex items-center justify-between px-3 py-3 rounded-xl text-sm font-bold text-white/50 hover:text-white hover:bg-cyan-500/5 transition-all w-full">
+                  {t.treatment}
+                  <Lucide.ChevronDown size={14} className={`transition-transform ${mobileTreatOpen ? 'rotate-180' : ''}`} />
                 </button>
-                {isMobileTreatmentOpen && (
-                  <div className="flex flex-col gap-1 pl-4 border-l-2 border-[#D4AF37]/30 ml-4 mb-1">
-                    <Link to="/dental-care" onClick={closeMobileMenu} className="py-2 text-sm font-bold text-gray-600 hover:text-[#D4AF37]">{t.dental}</Link>
-                    <Link to="/skin-care" onClick={closeMobileMenu} className="py-2 text-sm font-bold text-gray-600 hover:text-[#D4AF37]">{t.skin}</Link>
-                    <Link to="/transform" onClick={closeMobileMenu} className="py-2 text-sm font-bold text-gray-600 hover:text-[#D4AF37]">{t.transform}</Link>
-                    <Link to="/before-after" onClick={closeMobileMenu} className="py-2 text-sm font-bold text-gray-600 hover:text-[#D4AF37]">{t.beforeAfter}</Link>
+                {mobileTreatOpen && (
+                  <div className="ml-3 flex flex-col gap-0.5 border-l border-cyan-500/20 pl-4">
+                    {treatLinks.map((l) => (
+                      <Link key={l.path} to={l.path} onClick={closeMenu}
+                        className="py-2.5 text-sm font-bold text-white/30 hover:text-cyan-400 transition-colors">
+                        {l.label}
+                      </Link>
+                    ))}
                   </div>
                 )}
-              </nav>
 
-              {/* Language Section */}
-              <div className="h-[1px] bg-gray-100 my-4" />
-              <p className="text-[9px] font-black text-gray-400 uppercase tracking-[3px] mb-3">Language</p>
-              <div className="grid grid-cols-2 gap-2">
-                {languages.map((l) => (
-                  <button
-                    key={l.code}
-                    onClick={() => { setLang(l.code); closeMobileMenu(); }}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-[11px] font-bold border-2 transition-all ${
-                      lang === l.code
-                        ? 'border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5'
-                        : 'border-gray-100 text-gray-600 hover:border-[#D4AF37]/50'
-                    }`}
-                  >
-                    <span className="text-base">{l.flag}</span>
-                    <span>{l.name}</span>
-                  </button>
-                ))}
+                <div className="h-px bg-white/5 my-4" />
+                <p className="text-[9px] text-white/20 uppercase tracking-[3px] font-black mb-3">Language</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {languages.map((l) => (
+                    <button key={l.code} onClick={() => { setLang(l.code); closeMenu(); }}
+                      className={`flex items-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold border transition-all ${
+                        lang === l.code
+                          ? 'border-cyan-500 text-cyan-400 bg-cyan-500/5'
+                          : 'border-white/10 text-white/30 hover:border-white/20'
+                      }`}>
+                      <span className="text-base">{l.flag}</span>{l.name}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          </div>
-        </>
-      )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
-      {!isAdminPath && <WhatsAppWidget lang={lang} />}
+      {!isAdmin && <WhatsAppWidget lang={lang} />}
 
       <Routes>
         <Route path="/" element={<Home lang={lang} />} />
@@ -327,69 +332,75 @@ const AppContent = () => {
         <Route path="/appointment" element={<Appointment lang={lang} />} />
         <Route path="/testimonials" element={<Testimonials lang={lang} />} />
         <Route path="/st-admin-secure/login" element={<Login />} />
-        <Route
-          path="/st-admin-secure/*"
-          element={
-            <ProtectedRoute>
-              <AdminPanel lang={lang} />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/st-admin-secure/*" element={<ProtectedRoute><AdminPanel lang={lang} /></ProtectedRoute>} />
       </Routes>
 
-      {!isAdminPath && (
-        <footer className="bg-[#0f0f0f] text-white pt-20 pb-10 px-6 mt-20 border-t border-gray-800">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-[#D4AF37] rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-xl">ST</div>
-                <h3 className="font-black uppercase text-xl tracking-tighter leading-none">S T LESSER <br /><span className="text-[#D4AF37] text-sm">Dental & Aesthetic</span></h3>
-              </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                {lang === 'bn' ? 'মৌলভীবাজারের অন্যতম আধুনিক ডেন্টাল এবং স্কিন কেয়ার সেন্টার।' : "Sylhet & Moulvibazar's premier dental clinic with modern technology."}
-              </p>
-            </div>
-            <div className="lg:pl-10">
-              <h4 className="font-bold text-[#D4AF37] uppercase text-xs tracking-widest mb-8">{t.services}</h4>
-              <ul className="space-y-4 text-gray-400 text-sm font-medium">
-                <li><Link to="/dental-care" className="hover:text-[#D4AF37] transition-colors">{t.dental}</Link></li>
-                <li><Link to="/skin-care" className="hover:text-[#D4AF37] transition-colors">{t.skin}</Link></li>
-                <li><Link to="/transform" className="hover:text-[#D4AF37] transition-colors">{t.transform}</Link></li>
-                <li><Link to="/before-after" className="hover:text-[#D4AF37] transition-colors">{t.beforeAfter}</Link></li>
-              </ul>
-            </div>
-            <div className="space-y-6">
-              <h4 className="font-bold text-[#D4AF37] uppercase text-xs tracking-widest mb-8">{t.contact}</h4>
-              <div className="space-y-4">
-                <a href="tel:+8801711023730" className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center group-hover:bg-[#D4AF37] transition-all">
-                    <SafeIcon name="Phone" size={18} className="text-[#D4AF37] group-hover:text-white" />
-                  </div>
+      {/* ── FOOTER ── */}
+      {!isAdmin && (
+        <footer className="bg-[#060e1e] border-t border-cyan-500/10 pt-20 pb-8 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+
+              <div className="lg:col-span-2">
+                <div className="flex items-center gap-3 mb-5">
+                  <ToothLogo size={48} />
                   <div>
-                    <p className="text-[10px] text-gray-500 uppercase font-bold">{t.call}</p>
-                    <p className="text-sm font-black tracking-tight">+880 1711-023730</p>
+                    <p className="font-black text-white text-lg uppercase tracking-[2px]">S.T Laser</p>
+                    <p className="text-cyan-400/60 text-[9px] uppercase tracking-[2px]">Dental & Skin Care</p>
                   </div>
-                </a>
-                <a href="https://wa.me/8801711023730" target="_blank" rel="noreferrer" className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center group-hover:bg-[#25D366] transition-all">
-                    <SafeIcon name="MessageSquare" size={18} className="text-[#25D366] group-hover:text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-gray-500 uppercase font-bold">{t.whatsapp}</p>
-                    <p className="text-sm font-black tracking-tight">+880 1711-023730</p>
-                  </div>
+                </div>
+                <p className="text-white/30 text-sm leading-relaxed max-w-xs mb-6">
+                  {lang === 'bn'
+                    ? 'মৌলভীবাজারের অন্যতম আধুনিক লেজার ডেন্টাল এবং স্কিন কেয়ার সেন্টার।'
+                    : "Moulvibazar's premier laser dental & skin care center."}
+                </p>
+                <a href="tel:01616484616" className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-bold text-sm hover:bg-cyan-500/20 transition-all">
+                  <Lucide.Phone size={16} /> 01616-484616
                 </a>
               </div>
-            </div>
-            <div className="flex flex-col items-center lg:items-end">
-              <div className="bg-white p-3 rounded-2xl w-32 h-32 flex items-center justify-center shadow-2xl">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://stlesser.com/appointment" alt="QR Code" className="w-full h-full object-contain" />
+
+              <div>
+                <p className="text-[9px] text-cyan-400 uppercase tracking-[3px] font-black mb-5">{t.services}</p>
+                <ul className="space-y-3">
+                  {treatLinks.map(l => (
+                    <li key={l.path}>
+                      <Link to={l.path} className="text-white/30 text-sm hover:text-cyan-400 transition-colors flex items-center gap-2">
+                        <Lucide.ChevronRight size={12} className="text-cyan-500/50" />{l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <p className="text-[9px] mt-4 text-gray-500 font-black uppercase tracking-[3px]">Scan to Book</p>
+
+              <div>
+                <p className="text-[9px] text-cyan-400 uppercase tracking-[3px] font-black mb-5">{t.contact}</p>
+                <div className="space-y-4">
+                  <a href="tel:01616484616" className="flex items-center gap-3 group">
+                    <div className="w-8 h-8 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-all">
+                      <Lucide.Phone size={14} className="text-cyan-400" />
+                    </div>
+                    <span className="text-white/40 text-sm group-hover:text-white transition-colors">01616-484616</span>
+                  </a>
+                  <a href="https://wa.me/8801616484616" target="_blank" rel="noreferrer" className="flex items-center gap-3 group">
+                    <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-all">
+                      <Lucide.MessageSquare size={14} className="text-green-400" />
+                    </div>
+                    <span className="text-white/40 text-sm group-hover:text-white transition-colors">WhatsApp</span>
+                  </a>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-cyan-500/10 flex items-center justify-center">
+                      <Lucide.MapPin size={14} className="text-cyan-400" />
+                    </div>
+                    <span className="text-white/40 text-sm">Moulvibazar, Sylhet</span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="max-w-7xl mx-auto pt-8 border-t border-gray-900 flex justify-between items-center">
-            <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">© 2026 Code & Campaign. All Rights Reserved.</p>
+
+            <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-[9px] text-white/15 uppercase tracking-[3px] font-bold">© 2026 S.T Laser Dental & Skin Care. All Rights Reserved.</p>
+              <p className="text-[9px] text-white/10 uppercase tracking-[2px]">Developed by Code & Campaign</p>
+            </div>
           </div>
         </footer>
       )}
@@ -398,11 +409,7 @@ const AppContent = () => {
 };
 
 function App() {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
+  return <Router><AppContent /></Router>;
 }
 
 export default App;
