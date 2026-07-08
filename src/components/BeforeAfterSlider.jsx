@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactCompareImage from 'react-compare-image';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 
 const API = 'https://st-dental-backend.vercel.app/api/site-content/beforeafter';
 
@@ -43,20 +44,21 @@ const BeforeAfterSlider = ({ lang }) => {
   const subtitle = lang === 'bn' ? d.beforeAfterSubBn   : d.beforeAfterSubEn;
 
   return (
-    <section className="py-20 md:py-32 bg-[#0a0a0a] px-4 overflow-hidden">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-20 md:py-32 bg-[#0B1220] px-4 overflow-hidden relative">
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[#0891B2] opacity-[0.06] blur-[150px] pointer-events-none"></div>
+      <div className="max-w-6xl mx-auto relative z-10">
 
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-black text-white uppercase italic tracking-tighter">
             {lang === 'bn' ? (
-              <>{d.beforeAfterTitleBn} <span className="text-[#D4AF37]">সাফল্য</span></>
+              <>{d.beforeAfterTitleBn} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0891B2] to-[#22D3EE]">সাফল্য</span></>
             ) : (
-              <>{d.beforeAfterTitleEn} <span className="text-[#D4AF37]">Transformations</span></>
+              <>{d.beforeAfterTitleEn} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0891B2] to-[#22D3EE]">Transformations</span></>
             )}
           </h2>
-          <div className="w-24 h-1 bg-[#D4AF37] mx-auto mt-4 rounded-full opacity-50"></div>
-          <p className="text-[10px] md:text-xs text-gray-500 uppercase tracking-[4px] mt-6 font-bold">
+          <div className="w-24 h-1 bg-gradient-to-r from-[#0891B2] to-[#22D3EE] mx-auto mt-4 rounded-full opacity-70"></div>
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-[4px] mt-6 font-bold">
             {subtitle}
           </p>
         </div>
@@ -64,22 +66,29 @@ const BeforeAfterSlider = ({ lang }) => {
         {/* Sliders Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
           {d.beforeAfterSliders.map((slider, i) => (
-            <div key={i} className="group space-y-6">
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              className="group space-y-6"
+            >
               <div className="flex justify-between items-end border-b border-white/5 pb-2">
-                <h3 className="text-[#D4AF37] text-xs font-black uppercase tracking-widest">
+                <h3 className="text-[#22D3EE] text-xs font-black uppercase tracking-widest">
                   {lang === 'bn' ? slider.labelBn : slider.labelEn}
                 </h3>
-                <span className="text-[10px] text-gray-600 uppercase italic">
+                <span className="text-[10px] text-gray-500 uppercase italic">
                   Case #{slider.caseNo || String(i + 1).padStart(2, '0')}
                 </span>
               </div>
-              <div className="relative rounded-[30px] md:rounded-[50px] overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] group-hover:border-[#D4AF37]/30 transition-all duration-500">
+              <div className="relative rounded-[30px] md:rounded-[50px] overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] group-hover:border-[#0891B2]/40 group-hover:shadow-[0_20px_60px_rgba(8,145,178,0.2)] transition-all duration-500">
                 {slider.beforeImage && slider.afterImage ? (
                   <ReactCompareImage
                     leftImage={slider.beforeImage}
                     rightImage={slider.afterImage}
                     sliderLineWidth={3}
-                    sliderLineColor="#D4AF37"
+                    sliderLineColor="#0891B2"
                     handleSize={40}
                   />
                 ) : (
@@ -88,9 +97,9 @@ const BeforeAfterSlider = ({ lang }) => {
                   </div>
                 )}
                 <div className="absolute top-4 left-6 bg-black/60 backdrop-blur-md text-white text-[9px] px-3 py-1 rounded-full uppercase font-bold border border-white/10">Before</div>
-                <div className="absolute top-4 right-6 bg-[#D4AF37] text-black text-[9px] px-3 py-1 rounded-full uppercase font-bold">After</div>
+                <div className="absolute top-4 right-6 bg-gradient-to-r from-[#0891B2] to-[#06B6D4] text-white text-[9px] px-3 py-1 rounded-full uppercase font-bold">After</div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
