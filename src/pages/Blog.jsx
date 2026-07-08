@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Search, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Blog = ({ lang }) => {
   const [posts, setPosts] = useState([]);
@@ -62,7 +63,7 @@ const Blog = ({ lang }) => {
               onClick={() => setFilter(t.categoryKeys[i])}
               className={`text-[11px] font-bold tracking-widest uppercase transition-all whitespace-nowrap ${
                 filter === t.categoryKeys[i]
-                  ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                  ? 'text-[#0891B2] border-b-2 border-[#0891B2]'
                   : 'text-gray-400 hover:text-gray-600'
               }`}
             >
@@ -74,7 +75,7 @@ const Blog = ({ lang }) => {
           <input
             type="text"
             placeholder={t.search}
-            className="w-full bg-gray-50 border border-gray-200 rounded-full py-2.5 px-6 text-sm focus:outline-none focus:border-[#D4AF37]"
+            className="w-full bg-gray-50 border border-gray-200 rounded-full py-2.5 px-6 text-sm focus:outline-none focus:border-[#0891B2]"
             onChange={(e) => setSearch(e.target.value)}
           />
           <Search className="absolute right-4 top-3 text-gray-300" size={18} />
@@ -83,29 +84,37 @@ const Blog = ({ lang }) => {
 
       {/* Blog Grid */}
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-10">
-        {filteredPosts.length > 0 ? filteredPosts.map((post) => (
-          <div key={post._id} className="group cursor-pointer">
+        {filteredPosts.length > 0 ? filteredPosts.map((post, i) => (
+          <motion.div
+            key={post._id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: i * 0.05 }}
+            className="group cursor-pointer"
+          >
             <div className="relative overflow-hidden rounded-3xl mb-6 aspect-[4/3]">
               <img
                 src={post.image}
                 alt={post.title}
                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0891B2]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             </div>
-            <h3 className="text-xl font-bold mb-4 leading-tight group-hover:text-[#D4AF37] transition-colors">
+            <h3 className="text-xl font-bold mb-4 leading-tight group-hover:text-[#0891B2] transition-colors">
               {post.title}
             </h3>
             <p className="text-gray-500 text-sm mb-8 line-clamp-2">{post.description}</p>
             <div className="flex items-center justify-between border-t border-gray-50 pt-6">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#D4AF37] rounded-full flex items-center justify-center text-white text-[10px] font-bold">ST</div>
+                <div className="w-8 h-8 bg-gradient-to-br from-[#0891B2] to-[#06B6D4] rounded-full flex items-center justify-center text-white text-[10px] font-bold">ST</div>
                 <span className="text-[10px] font-black uppercase tracking-widest">{post.author || t.admin}</span>
               </div>
               <button className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest group-hover:gap-3 transition-all">
-                {t.details} <ChevronRight size={14} className="text-[#D4AF37]" />
+                {t.details} <ChevronRight size={14} className="text-[#0891B2]" />
               </button>
             </div>
-          </div>
+          </motion.div>
         )) : (
           <div className="col-span-3 text-center text-gray-400 py-20 text-sm">{t.noPost}</div>
         )}
