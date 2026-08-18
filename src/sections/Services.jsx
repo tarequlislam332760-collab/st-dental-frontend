@@ -24,51 +24,57 @@ const Reveal = ({ children, delay = 0, className = '' }) => {
   );
 };
 
-// All services from the clinic board
+// All services — matches the clinic poster exactly
 const defaultDentalBn = [
   { name: 'সম্পূর্ণ আধুনিক ডিজিটাল ডেন্টাল ইউনিট', icon: 'Monitor' },
-  { name: 'রুট ক্যানেল ট্রিটমেন্ট', icon: 'Activity' },
-  { name: 'স্কেলিং ও পলিশিং', icon: 'Sparkles' },
-  { name: 'দাঁতের স্থায়ী ও অস্থায়ী ফিলিং', icon: 'Layers' },
-  { name: 'শিশুদের ব্যথাহীন দাঁতের চিকিৎসা', icon: 'Baby' },
-  { name: 'অর্থোডন্টিক চিকিৎসা (আঁকা-বাঁকা ও উঁচু-নিচু)', icon: 'GitBranch' },
+  { name: 'রুট ক্যানেল ট্রিটমেন্ট (দাঁতের ভেতরের সংক্রমণের স্থায়ী সমাধান)', icon: 'Activity' },
+  { name: 'স্কেলিং এবং পলিশিং (দাঁত ও মাড়ির ময়লা পরিষ্কার)', icon: 'Sparkles' },
+  { name: 'স্থায়ী ও অস্থায়ী দাঁত ফিলিং', icon: 'Layers' },
+  { name: 'শিশুদের ব্যথামুক্ত দাঁতের চিকিৎসা', icon: 'Baby' },
+  { name: 'অর্থোডন্টিক ট্রিটমেন্ট (আকা-বাঁকা এবং উঁচু-নিচু দাঁত সোজা করা)', icon: 'GitBranch' },
   { name: 'ম্যাক্সিলোফেসিয়াল সার্জারি', icon: 'Scissors' },
-  { name: 'দাঁত সাদা করা', icon: 'Star' },
-  { name: 'ডেন্টাল ইম্প্লান্ট এন্ড ক্রাউন', icon: 'Award' },
-  { name: 'দাঁত তোলা ও বাঁধানো', icon: 'Wrench' },
-  { name: 'রেগুলার ডেন্টাল চেকআপ', icon: 'ClipboardCheck' },
+  { name: 'টিথ হোয়াইটেনিং (দাঁত সাদা করা)', icon: 'Star' },
+  { name: 'ডেন্টাল ইমপ্লান্ট এবং ক্রাউন (দাঁতের স্থায়ী প্রতিস্থাপন)', icon: 'Award' },
+  { name: 'দাঁত তোলা এবং বাঁধানো', icon: 'Wrench' },
+  { name: 'নিয়মিত ডেন্টাল চেকআপ', icon: 'ClipboardCheck' },
 ];
 
 const defaultDentalEn = [
   { name: 'Fully Modern Digital Dental Unit', icon: 'Monitor' },
-  { name: 'Root Canal Treatment', icon: 'Activity' },
-  { name: 'Scaling & Polishing', icon: 'Sparkles' },
-  { name: 'Permanent & Temporary Filling', icon: 'Layers' },
+  { name: 'Root Canal Treatment (Permanent solution for internal infection)', icon: 'Activity' },
+  { name: 'Scaling & Polishing (Cleaning teeth & gums)', icon: 'Sparkles' },
+  { name: 'Permanent & Temporary Tooth Filling', icon: 'Layers' },
   { name: 'Painless Dental Treatment for Children', icon: 'Baby' },
-  { name: 'Orthodontic Treatment (Braces)', icon: 'GitBranch' },
+  { name: 'Orthodontic Treatment (Straightening crooked & misaligned teeth)', icon: 'GitBranch' },
   { name: 'Maxillofacial Surgery', icon: 'Scissors' },
   { name: 'Teeth Whitening', icon: 'Star' },
-  { name: 'Dental Implant & Crown', icon: 'Award' },
+  { name: 'Dental Implant & Crown (Permanent tooth replacement)', icon: 'Award' },
   { name: 'Tooth Extraction & Fixing', icon: 'Wrench' },
   { name: 'Regular Dental Checkup', icon: 'ClipboardCheck' },
 ];
 
 const defaultSkinBn = [
-  { name: 'কার্বন ফেসিয়াল এবং কেমিক্যাল পিল', icon: 'Zap' },
-  { name: 'হাইড্রো ফেসিয়াল', icon: 'Droplets' },
-  { name: 'স্থায়ীভাবে লোম অপসারণ', icon: 'Scissors' },
+  { name: 'কার্বন ফেসিয়াল এবং কেমিক্যাল পিল (ত্বকের ভেতর থেকে ময়লা পরিষ্কার এবং উজ্জ্বলতা বৃদ্ধি)', icon: 'Zap' },
+  { name: 'হাইড্রো ফেসিয়াল (ত্বকের গভীর থেকে আর্দ্রতা এবং পুষ্টি জোগায়)', icon: 'Droplets' },
+  { name: 'স্থায়ী লোম অপসারণ (লেজার হেয়ার রিমুভাল)', icon: 'Scissors' },
+  { name: 'আঁচিল অপসারণ', icon: 'CircleDot' },
   { name: 'তিল অপসারণ', icon: 'Target' },
   { name: 'মেছতা ও দাগ অপসারণ', icon: 'Sun' },
-  { name: 'লেজার স্কিন টাইটেনিং', icon: 'Sparkles' },
+  { name: 'বলিরেখা এবং দাগ অপসারণ', icon: 'Sparkle' },
+  { name: 'ট্যাটু রিমুভ', icon: 'Eraser' },
+  { name: 'লেজার স্কিন টাইটেনিং (বয়সের ছাপ এবং ঝুলে যাওয়া ত্বক টানটান করে)', icon: 'Sparkles' },
 ];
 
 const defaultSkinEn = [
-  { name: 'Carbon Facial & Chemical Peel', icon: 'Zap' },
-  { name: 'Hydro Facial', icon: 'Droplets' },
-  { name: 'Permanent Hair Removal', icon: 'Scissors' },
+  { name: 'Carbon Facial & Chemical Peel (Deep cleansing & radiance boost)', icon: 'Zap' },
+  { name: 'Hydro Facial (Deep hydration & nourishment)', icon: 'Droplets' },
+  { name: 'Permanent Hair Removal (Laser Hair Removal)', icon: 'Scissors' },
+  { name: 'Skin Tag Removal', icon: 'CircleDot' },
   { name: 'Mole Removal', icon: 'Target' },
-  { name: 'Melasma & Scar Removal', icon: 'Sun' },
-  { name: 'Laser Skin Tightening', icon: 'Sparkles' },
+  { name: 'Melasma & Pigmentation Removal', icon: 'Sun' },
+  { name: 'Wrinkle & Scar Removal', icon: 'Sparkle' },
+  { name: 'Tattoo Removal', icon: 'Eraser' },
+  { name: 'Laser Skin Tightening (Reduces aging signs & sagging skin)', icon: 'Sparkles' },
 ];
 
 const defaults = {
@@ -131,7 +137,7 @@ const Service = ({ lang = 'bn' }) => {
                 </div>
                 <div>
                   <h3 className="text-white font-black uppercase tracking-wider text-base">
-                    {isBn ? 'ডেন্টাল সেবাসমূহ' : 'Dental Services'}
+                    {isBn ? 'ডেন্টাল সার্ভিস' : 'Dental Services'}
                   </h3>
                   <p className="text-cyan-400/50 text-[10px] uppercase tracking-widest">S.T Laser Dental</p>
                 </div>
@@ -173,7 +179,7 @@ const Service = ({ lang = 'bn' }) => {
                 </div>
                 <div>
                   <h3 className="text-white font-black uppercase tracking-wider text-base">
-                    {isBn ? 'স্কিন কেয়ার সেবাসমূহ' : 'Skin Care Services'}
+                    {isBn ? 'স্কিন কেয়ার সার্ভিস' : 'Skin Care Services'}
                   </h3>
                   <p className="text-teal-400/50 text-[10px] uppercase tracking-widest">Laser Skin Care</p>
                 </div>
