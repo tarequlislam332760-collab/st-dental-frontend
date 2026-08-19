@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import axios from 'axios';
 
 const API = 'https://st-dental-backend.vercel.app/api/site-content/services';
+const SESSIONS_API = 'https://st-dental-backend.vercel.app/api/service-sessions/public';
 
 const SafeIcon = ({ name, size = 20, className = '' }) => {
   const IC = Lucide[name] || Lucide.HelpCircle;
@@ -86,8 +87,67 @@ const defaults = {
   skinServicesEn: defaultSkinEn,
 };
 
+const STATUS_LABEL_BN = { pending: 'শীঘ্রই', completed: 'সম্পন্ন', cancelled: 'বাতিল' };
+const STATUS_LABEL_EN = { pending: 'Upcoming', completed: 'Completed', cancelled: 'Cancelled' };
+const STATUS_COLOR = { pending: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30', completed: 'text-green-400 bg-green-500/10 border-green-500/30', cancelled: 'text-red-400 bg-red-500/10 border-red-500/30' };
+
+// Modal showing session dates for a single service (no patient info — privacy)
+const SessionModal = ({ serviceName, isBn, onClose }) => {
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get(`${SESSIONS_API}/${encodeURIComponent(serviceName)}`)
+      .then(res => setSessions(res.data || []))
+      .catch(() => setSessions([]))
+      .finally(() => setLoading(false));
+  }, [serviceName]);
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4" onClick={onClose}>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+        className="bg-[#0f1f3d] border border-cyan-500/20 rounded-3xl p-6 w-full max-w-md shadow-2xl max-h-[80vh] overflow-y-auto"
+        onClick={e => e.stopPropagation()}>
+        <div className="flex items-start justify-between mb-5 gap-3">
+          <div>
+            <p className="text-cyan-400 text-[10px] uppercase font-black tracking-widest mb-1">{isBn ? 'সেশন তালিকা' : 'Session Schedule'}</p>
+            <h3 className="text-white font-black text-sm leading-snug">{serviceName}</h3>
+          </div>
+          <button onClick={onClose} className="p-1.5 bg-white/10 text-white rounded-lg hover:bg-white/20 shrink-0"><Lucide.X size={14} /></button>
+        </div>
+
+        {loading ? (
+          <p className="text-gray-500 text-xs text-center py-6 animate-pulse">{isBn ? 'লোড হচ্ছে...' : 'Loading...'}</p>
+        ) : sessions.length === 0 ? (
+          <p className="text-gray-500 text-xs text-center py-6">{isBn ? 'এই সার্ভিসের জন্য এখনো কোনো সেশন যোগ করা হয়নি।' : 'No sessions scheduled for this service yet.'}</p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {sessions.map((s, i) => (
+              <div key={i} className="flex items-center justify-between bg-white/5 rounded-xl px-4 py-3">
+                <span className="flex items-center gap-2 text-white text-sm font-bold">
+                  <Lucide.Calendar size={14} className="text-cyan-400" />
+                  {new Date(s.date).toLocaleDateString(isBn ? 'bn-BD' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </span>
+                <span className={`text-[9px] px-2.5 py-1 rounded-full uppercase font-black border ${STATUS_COLOR[s.status] || STATUS_COLOR.pending}`}>
+                  {(isBn ? STATUS_LABEL_BN : STATUS_LABEL_EN)[s.status] || s.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <a href="tel:01616484616"
+          className="mt-6 flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-black text-xs uppercase tracking-widest py-3 rounded-full hover:from-cyan-400 hover:to-blue-500 transition-all">
+          <Lucide.Phone size={14} /> {isBn ? 'সিরিয়াল নিতে কল করুন' : 'Call to Book'}
+        </a>
+      </motion.div>
+    </div>
+  );
+};
+
 const Service = ({ lang = 'bn' }) => {
   const [d, setD] = useState(defaults);
+  const [activeSession, setActiveSession] = useState(null); // serviceName currently viewed
 
   useEffect(() => {
     axios.get(API).then(res => {
@@ -106,6 +166,46 @@ const Service = ({ lang = 'bn' }) => {
   const isBn = lang === 'bn';
   const dentalServices = isBn ? d.dentalServicesBn : d.dentalServicesEn;
   const skinServices = isBn ? d.skinServicesBn : d.skinServicesEn;
+
+  // Static class maps — Tailwind can't purge dynamically interpolated class names,
+  // so we pre-define both accent variants in full.
+  const accentClasses = {
+    cyan: {
+      row: 'flex items-center gap-4 p-3 rounded-xl hover:bg-cyan-500/5 group transition-all',
+      iconWrap: 'w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center shrink-0 group-hover:bg-cyan-500/20 transition-all',
+      icon: 'text-cyan-400',
+      btn: 'flex items-center gap-1 text-[9px] uppercase font-black px-2.5 py-1.5 rounded-full border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all shrink-0',
+    },
+    teal: {
+      row: 'flex items-center gap-4 p-3 rounded-xl hover:bg-teal-500/5 group transition-all',
+      iconWrap: 'w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center shrink-0 group-hover:bg-teal-500/20 transition-all',
+      icon: 'text-teal-400',
+      btn: 'flex items-center gap-1 text-[9px] uppercase font-black px-2.5 py-1.5 rounded-full border border-teal-500/30 text-teal-400 hover:bg-teal-500 hover:text-white transition-all shrink-0',
+    },
+  };
+
+  const renderServiceRow = (s, i, accent) => {
+    const c = accentClasses[accent];
+    return (
+      <motion.div key={i}
+        initial={{ opacity: 0, x: -10 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: i * 0.04 }}
+        className={c.row}>
+        <div className={c.iconWrap}>
+          <SafeIcon name={s.icon} size={16} className={c.icon} />
+        </div>
+        <span className="text-white/70 text-sm font-medium group-hover:text-white transition-colors leading-snug flex-1">
+          {s.name}
+        </span>
+        <button onClick={() => setActiveSession(s.name)} className={c.btn}>
+          <Lucide.CalendarClock size={11} />
+          {isBn ? 'সেশন দেখুন' : 'View Sessions'}
+        </button>
+      </motion.div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#0a1628] pt-28 pb-24">
@@ -130,7 +230,6 @@ const Service = ({ lang = 'bn' }) => {
           {/* ── Dental ── */}
           <Reveal delay={0.1}>
             <div className="bg-[#0f1f3d] border border-cyan-500/10 rounded-3xl overflow-hidden">
-              {/* Card header */}
               <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/10 px-7 py-5 border-b border-cyan-500/10 flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
                   <Lucide.Stethoscope size={22} className="text-cyan-400" />
@@ -143,27 +242,10 @@ const Service = ({ lang = 'bn' }) => {
                 </div>
               </div>
 
-              {/* Service list */}
               <div className="p-6 space-y-1">
-                {dentalServices.map((s, i) => (
-                  <motion.div key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.04 }}
-                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-cyan-500/5 group transition-all cursor-default">
-                    <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center shrink-0 group-hover:bg-cyan-500/20 transition-all">
-                      <SafeIcon name={s.icon} size={16} className="text-cyan-400" />
-                    </div>
-                    <span className="text-white/70 text-sm font-medium group-hover:text-white transition-colors leading-snug">
-                      {s.name}
-                    </span>
-                    <Lucide.ChevronRight size={14} className="text-cyan-500/30 ml-auto shrink-0 group-hover:text-cyan-400 transition-colors" />
-                  </motion.div>
-                ))}
+                {dentalServices.map((s, i) => renderServiceRow(s, i, 'cyan'))}
               </div>
 
-              {/* Image */}
               <div className="mx-6 mb-6 rounded-2xl overflow-hidden">
                 <img src={d.servicesImage1} alt="Dental" className="w-full h-48 object-cover hover:scale-105 transition-transform duration-700" />
               </div>
@@ -186,22 +268,7 @@ const Service = ({ lang = 'bn' }) => {
               </div>
 
               <div className="p-6 space-y-1">
-                {skinServices.map((s, i) => (
-                  <motion.div key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.06 }}
-                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-teal-500/5 group transition-all cursor-default">
-                    <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center shrink-0 group-hover:bg-teal-500/20 transition-all">
-                      <SafeIcon name={s.icon} size={16} className="text-teal-400" />
-                    </div>
-                    <span className="text-white/70 text-sm font-medium group-hover:text-white transition-colors leading-snug">
-                      {s.name}
-                    </span>
-                    <Lucide.ChevronRight size={14} className="text-teal-500/30 ml-auto shrink-0 group-hover:text-teal-400 transition-colors" />
-                  </motion.div>
-                ))}
+                {skinServices.map((s, i) => renderServiceRow(s, i, 'teal'))}
               </div>
 
               <div className="mx-6 mb-6 rounded-2xl overflow-hidden">
@@ -220,6 +287,13 @@ const Service = ({ lang = 'bn' }) => {
           </a>
         </Reveal>
       </div>
+
+      {/* Session modal */}
+      <AnimatePresence>
+        {activeSession && (
+          <SessionModal serviceName={activeSession} isBn={isBn} onClose={() => setActiveSession(null)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
