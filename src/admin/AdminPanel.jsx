@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, MessageSquare, LogOut, Trash2, Menu, X, Clock, Calendar, FileText, Globe, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, MessageSquare, LogOut, Trash2, Menu, X, Clock, Calendar, FileText, Globe, Settings, CalendarClock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
@@ -8,6 +8,7 @@ import ManageAppointments from './ManageAppointments';
 import ManageReviews from './ManageReviews';
 import ManageBlogs from './ManageBlogs';
 import ManageSiteContent from './ManageSiteContent';
+import ManageServiceSessions from './ManageServiceSessions';
 
 const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   const [lang, setLang] = useState(initialLang);
@@ -51,7 +52,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   const t = {
     en: {
       dash: "Dashboard", appt: "Appointments", rev: "Reviews", blog: "Blogs",
-      site: "Site Content", logout: "Logout",
+      site: "Site Content", sessions: "Service Sessions", logout: "Logout",
       welcome: "Welcome back,", subtitle: "Manage your dental & skin care clinic.",
       recent: "Recent Schedule", viewAll: "View All", loading: "Loading Data...",
       noDate: "No Date", noTime: "No Time",
@@ -61,7 +62,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
     },
     bn: {
       dash: "ড্যাশবোর্ড", appt: "অ্যাপয়েন্টমেন্ট", rev: "রিভিউ", blog: "ব্লগ",
-      site: "সাইট কন্টেন্ট", logout: "লগআউট",
+      site: "সাইট কন্টেন্ট", sessions: "সার্ভিস সেশন", logout: "লগআউট",
       welcome: "স্বাগতম,", subtitle: "ডেন্টাল এবং স্কিন কেয়ার ক্লিনিক পরিচালনা করুন।",
       recent: "সাম্প্রতিক শিডিউল", viewAll: "সব দেখুন", loading: "লোড হচ্ছে...",
       noDate: "তারিখ নেই", noTime: "সময় নেই",
@@ -83,11 +84,12 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
   };
 
   const navItems = [
-    { id: 'dashboard',   label: t.dash, icon: LayoutDashboard },
-    { id: 'appointments',label: t.appt, icon: Users },
-    { id: 'reviews',     label: t.rev,  icon: MessageSquare },
-    { id: 'blogs',       label: t.blog, icon: FileText },
-    { id: 'sitecontent', label: t.site, icon: Settings },
+    { id: 'dashboard',   label: t.dash,     icon: LayoutDashboard },
+    { id: 'appointments',label: t.appt,     icon: Users },
+    { id: 'reviews',     label: t.rev,      icon: MessageSquare },
+    { id: 'blogs',       label: t.blog,     icon: FileText },
+    { id: 'sitecontent', label: t.site,     icon: Settings },
+    { id: 'sessions',    label: t.sessions, icon: CalendarClock },
   ];
 
   return (
@@ -123,7 +125,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
             <button
               key={item.id}
@@ -187,6 +189,7 @@ const AdminPanel = ({ lang: initialLang = 'bn' }) => {
             {activeTab === 'reviews'      && <ManageReviews lang={lang} />}
             {activeTab === 'blogs'        && <ManageBlogs lang={lang} t={t.blogActions} />}
             {activeTab === 'sitecontent'  && <ManageSiteContent lang={lang} />}
+            {activeTab === 'sessions'     && <ManageServiceSessions lang={lang} />}
           </motion.div>
         </AnimatePresence>
 
